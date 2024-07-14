@@ -1,0 +1,64 @@
+server:
+  port: 8180
+spring:
+  application:
+    name: raggies-notification
+  datasource:
+    url: ${DATABASE_URL:jdbc:postgresql://localhost:5432/raggies}
+    username: ${DATABASE_USERNAME:postgres}
+    password: ${DATABASE_PASSWORD:password}
+    driver-class-name: org.postgresql.Driver
+  jooq:
+    sql-dialect: postgres
+  liquibase:
+    enabled: false
+  batch:
+    jdbc:
+      initialize-schema: never
+  #  security:
+#    oauth2:
+#      resourceserver:
+#        jwt:
+#          issuer-uri: http://localhost:9090/realms/raggies-realm
+  rabbitmq:
+    virtual-host: vhost
+    port: 5672
+    username: admin
+    password: admin
+    template:
+      retry:
+        enabled: true
+        max-attempts: 3
+    listener:
+      direct:
+        default-requeue-rejected: false
+  mail:
+    username: ${SMTP_USERNAME:smtp}
+    password: ${SMTP_PASSWORD:password}
+    host: ${SMTP_HOST:127.0.0.1}
+    port: ${SMTP_PORT:1025}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+          transport:
+            protocol: smtp
+          ssl: enable
+
+app:
+  batch-processing:
+    chunk-size: 2
+    retry-limit: 3
+  notifications:
+    exchange: raggies
+    concurrent-consumers: 5
+    queues:
+      distribution:
+        queue-name: ${NOTIFICATION_QUEUE:distribution-notifications}
+        routing-key: ${NOTIFICATION_ROUTING:distribution}
+      personal:
+        queue-name: ${NOTIFICATION_QUEUE:personal-notifications}
+        routing-key: ${NOTIFICATION_ROUTING:personal}
+      dead-letter-queue: ${DLQ:dead-letter-queue}

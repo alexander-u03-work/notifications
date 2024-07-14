@@ -1,0 +1,11 @@
+spring:
+  jpa:
+    show-sql: true
+  mail:
+    properties:
+      mail:
+        ssl:
+          enable: false
+app:
+  batch-processing:
+    chunk-size: 2
