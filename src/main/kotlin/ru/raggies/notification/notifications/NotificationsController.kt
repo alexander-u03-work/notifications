@@ -15,18 +15,18 @@ class NotificationsController(
 
     @PostMapping("/users")
     fun notificateUsers(@RequestBody request: NotificationRequest): ResponseEntity<*> {
-        rabbitTemplate.convertAndSend(properties.exchange, properties.distributionRoutingKey(), request)
+        rabbitTemplate.convertAndSend(properties.distributionQueueName(), request)
         return ResponseEntity.ok().body(request.args)
     }
 
     @PostMapping("/users/personal")
     fun notificateUser(@RequestBody request: PersonalNotificationRequest): ResponseEntity<*> {
-        rabbitTemplate.convertAndSend(properties.exchange, properties.personalRoutingKey(),  request)
+        rabbitTemplate.convertAndSend(properties.personalQueueName(),  request)
         return ResponseEntity.ok().body(request.args)
     }
 
     @GetMapping("/types")
-    fun getNotificationTypes(@RequestParam forUser: Boolean): List<Notification> =
+    fun getNotificationTypes(): List<Notification> =
         notificationManager.getNotificationTypes()
 
 }

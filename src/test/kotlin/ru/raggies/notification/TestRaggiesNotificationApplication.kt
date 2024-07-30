@@ -1,4 +1,4 @@
-package ru.raggies.raggiesnotification
+package ru.raggies.notification
 
 import org.springframework.boot.fromApplication
 import org.springframework.boot.test.context.TestConfiguration
@@ -10,23 +10,21 @@ import org.testcontainers.containers.RabbitMQContainer
 import org.testcontainers.utility.DockerImageName
 
 @TestConfiguration(proxyBeanMethods = false)
-class TestRaggiesNotificationApplication {
+class TestNotificationApplication {
 
     @Bean
     @ServiceConnection
-    fun postgresContainer(): PostgreSQLContainer<*> {
-        return PostgreSQLContainer(DockerImageName.parse("postgres:latest"))
-    }
+    fun postgresContainer(): PostgreSQLContainer<*> =
+        PostgreSQLContainer(DockerImageName.parse("postgres:latest"))
 
     @Bean
     @ServiceConnection
-    fun rabbitContainer(): RabbitMQContainer {
-        return RabbitMQContainer(DockerImageName.parse("rabbitmq:latest"))
-    }
+    fun rabbitContainer(): RabbitMQContainer =
+        RabbitMQContainer(DockerImageName.parse("rabbitmq:latest"))
 
 }
 
 fun main(args: Array<String>) {
-    fromApplication<ru.raggies.notification.RaggiesNotificationApplication>()
-        .with(TestRaggiesNotificationApplication::class).run(*args)
+    fromApplication<NotificationApplication>()
+        .with(TestNotificationApplication::class).run(*args)
 }
