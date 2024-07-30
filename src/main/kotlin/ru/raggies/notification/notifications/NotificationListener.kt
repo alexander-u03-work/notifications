@@ -1,13 +1,12 @@
-package ru.raggies.notification.notifications.processing
+package ru.raggies.notification.notifications
 
 import org.springframework.amqp.rabbit.annotation.RabbitListener
 import org.springframework.batch.core.Job
 import org.springframework.batch.core.JobParametersBuilder
 import org.springframework.batch.core.launch.JobLauncher
 import org.springframework.stereotype.Component
-import ru.raggies.notification.notifications.NotificationRequest
-import ru.raggies.notification.notifications.PersonalNotificationRequest
-import ru.raggies.notification.notifications.UserNotificationManager
+import ru.raggies.notification.notifications.processing.NotificationItemReader
+import ru.raggies.notification.notifications.processing.NotificationSender
 
 @Component
 class NotificationListener(
@@ -15,7 +14,7 @@ class NotificationListener(
     private val notificationSender: NotificationSender,
     private val distributionNotificationListener: NotificationItemReader,
     private val jobLauncher: JobLauncher,
-    private val notificationJob: Job
+    private val notificationJob: Job,
 ) {
 
     @RabbitListener(queues = ["distribution-notifications"])
@@ -30,12 +29,10 @@ class NotificationListener(
 
     @RabbitListener(queues = ["personal-notifications"])
     fun personalNotificationsListener(request: PersonalNotificationRequest) {
-        val statistic = userNotificationManager.getUserByEmailAndNotificationName(request) ?:
+        val statistic = userNotificationManager.getUserByEmailAndNotificationName(request.notificationName, request.email) ?:
             return
 
-        notificationSender.sendNotification(statistic)
+        notificationSender.sendNotification(UserNotificationInfo(request, statistic))
     }
-
-
 
 }

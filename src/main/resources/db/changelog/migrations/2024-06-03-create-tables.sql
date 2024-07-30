@@ -66,7 +66,7 @@ insert into notification_schema.template values
 <body>
 <div>Заказ <b>${orderId}</b> <br>
 <div>Был принят в работу<br>
-<div>Ожидаемое время доставки <b>${expectedOrderDeliveryTime}</b> <br>
+<div>Ожидаемое время доставки <b>${expectedDeliveryTime}</b> <br>
 <div>Способ оплаты <b>${payment}</b> <br>
 </body>
 </html>', 'Created'),
@@ -80,6 +80,19 @@ insert into notification_schema.template values
 <body>
 <div>Акция <b>${promotionName}</b> <br>
 <div>${promotionText}<br>
+</body>
+</html>', 'Created'),
+(3, 'ChangeStatusOrderNotification', '<!doctype html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, user-scalable=no,initialscale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="ie=edge">
+<title>Информация о заказе</title>
+</head>
+<body>
+<div>Заказ <b>${orderId}</b> <br>
+<div>Поменял статус <b>${orderStatus}</b><br>
 </body>
 </html>', 'Created');
 

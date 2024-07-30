@@ -10,19 +10,18 @@ import org.springframework.batch.core.configuration.annotation.EnableBatchProces
 import org.springframework.batch.core.job.builder.JobBuilder
 import org.springframework.batch.core.repository.JobRepository
 import org.springframework.batch.core.step.builder.StepBuilder
-import org.springframework.boot.autoconfigure.jdbc.DataSourceProperties
 import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.transaction.PlatformTransactionManager
 import ru.raggies.notification.notifications.NotificationProperties
+import ru.raggies.notification.notifications.UserNotificationInfo
 import ru.raggies.notification.notifications.processing.BatchProcessingProperties
 import ru.raggies.notification.notifications.processing.NotificationItemReader
 import ru.raggies.notification.notifications.processing.NotificationSender
-import ru.raggies.notification.notifications.processing.UserNotificationStatistic
 
 @EnableBatchProcessing
-@EnableConfigurationProperties(value = [BatchProcessingProperties::class, NotificationProperties::class, DataSourceProperties::class])
+@EnableConfigurationProperties(value = [BatchProcessingProperties::class, NotificationProperties::class])
 @Configuration
 class ModuleConfiguration(
     private val notificationProperties: NotificationProperties,
@@ -30,28 +29,13 @@ class ModuleConfiguration(
 ) {
 
     @Bean
-    fun notificationExchange() = DirectExchange(notificationProperties.exchange)
+    fun personalNotificationsQueue() = Queue(notificationProperties.personalQueueName())
 
     @Bean
-    fun personalNotificationBinding(): Binding =
-        BindingBuilder
-            .bind(personalNotificationsQueue())
-            .to(notificationExchange())
-            .with(notificationProperties.personalRoutingKey())
-
-
-    @Bean
-    fun distributionNotificationBinding(): Binding =
-        BindingBuilder
-            .bind(distributionNotificationsQueue())
-            .to(notificationExchange())
-            .with(notificationProperties.distributionRoutingKey())
+    fun subscribeOnRegisterQueue() = Queue(notificationProperties.subscribeOnRegisterQueueName())
 
     @Bean
     fun distributionNotificationsQueue() = Queue(notificationProperties.distributionQueueName())
-
-    @Bean
-    fun personalNotificationsQueue() = Queue(notificationProperties.personalQueueName())
 
     @Bean
     fun deadLetterQueue(): Queue =
@@ -104,7 +88,7 @@ class ModuleConfiguration(
         notificationListener: NotificationItemReader,
         notificationSender: NotificationSender,
     ): Step = StepBuilder("sendingNotification", jobRepository)
-        .chunk<UserNotificationStatistic, UserNotificationStatistic>(processingProperties.chunkSize, transactionManager)
+        .chunk<UserNotificationInfo, UserNotificationInfo>(processingProperties.chunkSize, transactionManager)
         .reader(notificationListener)
         .writer(notificationSender)
         .build()

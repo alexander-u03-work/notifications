@@ -11,23 +11,16 @@ data class NotificationProperties(
 
     data class Queues(
         val deadLetterQueue: String,
-        val personal: QueueProperties,
-        val distribution: QueueProperties
-    ) {
+        val personal: String,
+        val distribution: String,
+        val subscribeOnRegister: String,
+    )
 
-        data class QueueProperties(
-            val routingKey: String,
-            val queueName: String,
-        )
-    }
+    fun personalQueueName() = queues.personal
 
-    fun personalQueueName() = queues.personal.queueName
+    fun distributionQueueName() = queues.distribution
 
-    fun personalRoutingKey() = queues.personal.routingKey
-
-    fun distributionQueueName() = queues.distribution.queueName
-
-    fun distributionRoutingKey() = queues.distribution.routingKey
+    fun subscribeOnRegisterQueueName() = queues.subscribeOnRegister
 
     fun deadLetterQueueName() = queues.deadLetterQueue
 

@@ -55,10 +55,7 @@ app:
     exchange: raggies
     concurrent-consumers: 5
     queues:
-      distribution:
-        queue-name: ${NOTIFICATION_QUEUE:distribution-notifications}
-        routing-key: ${NOTIFICATION_ROUTING:distribution}
-      personal:
-        queue-name: ${NOTIFICATION_QUEUE:personal-notifications}
-        routing-key: ${NOTIFICATION_ROUTING:personal}
+      distribution: ${NOTIFICATION_QUEUE:distribution-notifications}
+      personal: ${NOTIFICATION_QUEUE:personal-notifications}
+      subscribe-on-register: ${SUBSCRIBE_ON_REGISTER_QUEUE:subscribe-on-register}
       dead-letter-queue: ${DLQ:dead-letter-queue}
