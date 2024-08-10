@@ -39,6 +39,7 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-batch")
     developmentOnly("org.springframework.boot:spring-boot-devtools")
     implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.6.0")
+    implementation("org.springframework.boot:spring-boot-starter-logging")
 
     implementation("org.springframework.boot:spring-boot-starter-jooq")
     implementation("org.liquibase:liquibase-core")

@@ -59,3 +59,15 @@ app:
       personal: ${NOTIFICATION_QUEUE:personal-notifications}
       subscribe-on-register: ${SUBSCRIBE_ON_REGISTER_QUEUE:subscribe-on-register}
       dead-letter-queue: ${DLQ:dead-letter-queue}
+
+logging:
+  file:
+    path: logs
+    info-name: info
+    error-name: error
+  logback:
+    rollingpolicy:
+      min-index: 1
+      max-index: 10
+    trigger-policy:
+      max-file-size: 50MB
