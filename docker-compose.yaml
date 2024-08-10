@@ -1,4 +1,16 @@
 services:
+  app:
+    container_name: notifications-service
+    build:
+      context: .
+      dockerfile: raggies.dockerfile
+    ports:
+      - '8180:8080'
+    restart: on-failure
+    depends_on:
+      smtp:
+        condition: service_started
+
   smtp:
     image: mailhog/mailhog:v1.0.1
     container_name: raggies-smtp
