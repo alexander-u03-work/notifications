@@ -1,11 +1,13 @@
+
 services:
+
   app:
     container_name: notifications-service
     build:
       context: .
       dockerfile: raggies.dockerfile
     ports:
-      - '8180:8080'
+      - '8180:8180'
     restart: on-failure
     depends_on:
       smtp:
