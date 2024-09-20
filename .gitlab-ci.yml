@@ -1,0 +1,47 @@
+stages:
+  - test
+  - build_app
+
+variables:
+  TC_CLOUD_TOKEN: aj_tcc_svc_cF8fDf1FqgefD8BGZeej_6bxsZzpwjfRN-vcz2fM-bhon
+  APP_NAME: raggies
+  CHART_NAME: raggies
+  CONTAINER_REGISTRY_USERNAME: raggies
+
+cache:
+  paths:
+    - .m2/repository
+
+test:
+  stage: test
+  image: gradle:jdk17
+  script:
+    - curl -fsSL https://app.testcontainers.cloud/bash | bash
+    - './gradlew test'
+    - echo "Package and tests finished"
+  artifacts:
+    name: raggies-0.0.1-SNAPSHOT.jar
+    paths:
+      - target/
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+
+build-docker:
+  stage: build_app
+  services:
+    - docker:24.0.5-dind
+  variables:
+    DOCKER_TLS_CERTDIR: ""
+    DOCKER_HOST: "tcp://docker:2375"
+    DOCKER_DRIVER: overlay2
+  only:
+    - main
+    - develop
+  when: manual
+  before_script:
+    - docker login raggies.gitlab.yandexcloud.net:5050 -u ${CONTAINER_REGISTRY_USERNAME} -p ${CONTAINER_REGISTRY_TOKEN}
+  script:
+    - docker build . -t raggies.gitlab.yandexcloud.net:5050/main/raggies-devops/raggies-notifications:${NOTIFICATION_BUILD_VERSION} -f raggies.dockerfile
+    - docker push raggies.gitlab.yandexcloud.net:5050/main/raggies-devops/raggies-notifications:${NOTIFICATION_BUILD_VERSION}
+  dependencies:
+    - test
