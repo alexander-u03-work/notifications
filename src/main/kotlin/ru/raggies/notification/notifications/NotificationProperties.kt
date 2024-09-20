@@ -10,7 +10,6 @@ data class NotificationProperties(
 ) {
 
     data class Queues(
-        val deadLetterQueue: String,
         val personal: String,
         val distribution: String,
         val subscribeOnRegister: String,
@@ -21,7 +20,5 @@ data class NotificationProperties(
     fun distributionQueueName() = queues.distribution
 
     fun subscribeOnRegisterQueueName() = queues.subscribeOnRegister
-
-    fun deadLetterQueueName() = queues.deadLetterQueue
 
 }

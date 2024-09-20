@@ -1,6 +1,6 @@
 package ru.raggies.notification.subscribtions
 
-data class SubscribeOnRegisterRequest(
+data class SubscribeRequest(
     val userId: Long,
     val email: String
 )

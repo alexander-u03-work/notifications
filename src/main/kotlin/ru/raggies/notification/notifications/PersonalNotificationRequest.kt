@@ -1,7 +1,7 @@
 package ru.raggies.notification.notifications
 
 class PersonalNotificationRequest(
+    val userId: Long,
     notificationName: String,
-    args: Map<String, String>,
-    val email: String,
-): NotificationRequest(notificationName, args)
+    messageArgs: Map<String, String>
+): NotificationRequest(notificationName, messageArgs)

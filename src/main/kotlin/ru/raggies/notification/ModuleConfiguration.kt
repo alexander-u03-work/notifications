@@ -1,10 +1,14 @@
 package ru.raggies.notification
 
 import com.fasterxml.jackson.databind.ObjectMapper
-import org.springframework.amqp.core.*
+import org.springframework.amqp.core.Queue
+import org.springframework.amqp.core.QueueBuilder
+import org.springframework.amqp.rabbit.connection.ConnectionFactory
+import org.springframework.amqp.rabbit.core.RabbitTemplate
 import org.springframework.amqp.rabbit.listener.ConditionalRejectingErrorHandler
 import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter
 import org.springframework.batch.core.Job
+import org.springframework.batch.core.JobParametersBuilder
 import org.springframework.batch.core.Step
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing
 import org.springframework.batch.core.job.builder.JobBuilder
@@ -15,10 +19,11 @@ import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.transaction.PlatformTransactionManager
 import ru.raggies.notification.notifications.NotificationProperties
-import ru.raggies.notification.notifications.UserNotificationInfo
-import ru.raggies.notification.notifications.processing.BatchProcessingProperties
-import ru.raggies.notification.notifications.processing.NotificationItemReader
-import ru.raggies.notification.notifications.processing.NotificationSender
+import ru.raggies.notification.notifications.batch.BatchProcessingProperties
+import ru.raggies.notification.notifications.batch.NotificationProcessRequest
+import ru.raggies.notification.notifications.batch.NotificationRequestProvider
+import ru.raggies.notification.notifications.sending.NotificationDeliveryProvider
+
 
 @EnableBatchProcessing
 @EnableConfigurationProperties(value = [BatchProcessingProperties::class, NotificationProperties::class])
@@ -35,12 +40,15 @@ class ModuleConfiguration(
     fun subscribeOnRegisterQueue() = Queue(notificationProperties.subscribeOnRegisterQueueName())
 
     @Bean
+    fun jobProcessingQueue() = Queue(processingProperties.jobProcessingQueueName())
+
+    @Bean
     fun distributionNotificationsQueue() = Queue(notificationProperties.distributionQueueName())
 
     @Bean
     fun deadLetterQueue(): Queue =
         QueueBuilder
-            .durable("${notificationProperties.deadLetterQueueName()}.dlq")
+            .durable("${processingProperties.deadLetterQueueName()}.dlq")
             .build()
 
     @Bean
@@ -85,11 +93,11 @@ class ModuleConfiguration(
     fun notificationStep(
         jobRepository: JobRepository,
         transactionManager: PlatformTransactionManager,
-        notificationListener: NotificationItemReader,
-        notificationSender: NotificationSender,
+        notificationProvider: NotificationRequestProvider,
+        notificationSender: NotificationDeliveryProvider,
     ): Step = StepBuilder("sendingNotification", jobRepository)
-        .chunk<UserNotificationInfo, UserNotificationInfo>(processingProperties.chunkSize, transactionManager)
-        .reader(notificationListener)
+        .chunk<NotificationProcessRequest, NotificationProcessRequest>(processingProperties.chunkSize, transactionManager)
+        .reader(notificationProvider)
         .writer(notificationSender)
         .build()
 
