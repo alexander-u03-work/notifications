@@ -1,26 +1,21 @@
 package ru.raggies.notification.templates
 
 import org.springframework.stereotype.Service
-import ru.raggies.notification.enums.TemplateStatus
-import ru.raggies.notification.tables.Template.Companion.TEMPLATE
-import ru.raggies.notification.tables.daos.TemplateDao
-import ru.raggies.notification.tables.pojos.Template
+import ru.raggies.notification.exceptions.ApplicationException
 
 @Service
 class TemplateManager(
-    private val templateDao: TemplateDao
+    private val templateRepository: TemplateRepository
 ) {
 
-    fun getTemplates(): List<Template> = templateDao.ctx()
-        .selectFrom(TEMPLATE)
-        .where(TEMPLATE.STATUS.eq(TemplateStatus.Created))
-        .fetchInto(Template::class.java)
+    fun getTemplates(): List<Template> = templateRepository.findAll()
+        .map { it.toDTO() }
 
-    fun getTemplateByName(templateName: String): Template? = templateDao.ctx()
-        .select(TEMPLATE)
-        .from(TEMPLATE)
-        .where(TEMPLATE.NAME.eq(templateName))
-        .and(TEMPLATE.STATUS.eq(TemplateStatus.Created))
-        .fetchOneInto(Template::class.java)
+    fun getTemplateByName(templateName: String): Template {
+        val template = templateRepository.findByName(templateName) ?:
+            throw ApplicationException("Template not found: $templateName")
+
+        return template.toDTO()
+    }
 
 }

@@ -6,13 +6,21 @@ spring:
   datasource:
     url: ${DATABASE_URL:jdbc:postgresql://localhost:5432/raggies}
     username: ${DATABASE_USERNAME:postgres}
-    password: ${DATABASE_PASSWORD:password}
-    driver-class-name: org.postgresql.Driver
-  jooq:
-    sql-dialect: postgres
+    password: ${DATABASE_PASSWORD:postgres}
+  jpa:
+    show-sql: false
+    hibernate:
+      ddl-auto: none
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        default_schema: notification_schema
   liquibase:
-    enabled: false
+    change-log: classpath:/db/changelog/master.yaml
+    drop-first: false
   batch:
+    job:
+      enabled: false
     jdbc:
       initialize-schema: never
   #  security:
@@ -49,8 +57,11 @@ spring:
 
 app:
   batch-processing:
-    chunk-size: 2
+    chunk-size: 20
     retry-limit: 3
+    queues:
+      job-processing: ${JOB_PROCESSING_QUEUE:job-processing}
+      dead-letter: ${DLQ:dead-letter-queue}
   notifications:
     exchange: raggies
     concurrent-consumers: 5
@@ -58,13 +69,8 @@ app:
       distribution: ${NOTIFICATION_QUEUE:distribution-notifications}
       personal: ${NOTIFICATION_QUEUE:personal-notifications}
       subscribe-on-register: ${SUBSCRIBE_ON_REGISTER_QUEUE:subscribe-on-register}
-      dead-letter-queue: ${DLQ:dead-letter-queue}
 
 logging:
-  file:
-    path: logs
-    info-name: info
-    error-name: error
   logback:
     rollingpolicy:
       min-index: 1

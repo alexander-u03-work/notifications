@@ -1,32 +1,23 @@
 package ru.raggies.notification.notifications
 
-import org.springframework.amqp.rabbit.core.RabbitTemplate
-import org.springframework.http.ResponseEntity
-import org.springframework.web.bind.annotation.*
-import ru.raggies.notification.tables.pojos.Notification
+import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.web.bind.annotation.RequestMapping
+import org.springframework.web.bind.annotation.RestController
 
 @RestController
-@RequestMapping("/notifications")
+@RequestMapping(NotificationsController.BASE_URL)
 class NotificationsController(
-    private val notificationManager: NotificationManager,
-    private val rabbitTemplate: RabbitTemplate,
-    private val properties: NotificationProperties
+    private val notificationManager: NotificationManager
 ) {
 
-    @PostMapping("/users")
-    fun notificateUsers(@RequestBody request: NotificationRequest): ResponseEntity<*> {
-        rabbitTemplate.convertAndSend(properties.distributionQueueName(), request)
-        return ResponseEntity.ok().body(request.args)
+    companion object {
+        const val BASE_URL = "/api/notifications"
     }
 
-    @PostMapping("/users/personal")
-    fun notificateUser(@RequestBody request: PersonalNotificationRequest): ResponseEntity<*> {
-        rabbitTemplate.convertAndSend(properties.personalQueueName(),  request)
-        return ResponseEntity.ok().body(request.args)
-    }
+    @GetMapping
+    fun getNotifications(): List<Notification> = notificationManager.getNotifications()
 
-    @GetMapping("/types")
-    fun getNotificationTypes(): List<Notification> =
-        notificationManager.getNotificationTypes()
+    @GetMapping("types")
+    fun getNotificationTypes(): List<NotificationType> = notificationManager.getNotificationTypes()
 
 }

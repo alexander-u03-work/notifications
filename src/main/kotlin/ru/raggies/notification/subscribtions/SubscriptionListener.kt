@@ -5,12 +5,12 @@ import org.springframework.stereotype.Component
 
 @Component
 class SubscriptionListener(
-    private val subscriptionManager: UserSubscriptionManager
+    private val subscriptionManager: SubscriptionManager
 ) {
 
     @RabbitListener(queues = ["subscribe-on-register"])
-    fun subscribeOnRegisterListener(request: SubscribeOnRegisterRequest) {
-        subscriptionManager.subscribeUserForNotifications(request)
+    fun subscribeOnRegisterListener(request: SubscribeRequest) {
+        subscriptionManager.subscribeUser(request)
     }
 
 }
