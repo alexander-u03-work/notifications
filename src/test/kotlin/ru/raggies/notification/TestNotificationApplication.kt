@@ -13,9 +13,9 @@ import org.testcontainers.junit.jupiter.Testcontainers
 @Testcontainers
 class TestNotificationApplication {
 
-    @Bean
+    /*@Bean
     fun testRabbitTemplate(connectionFactory: ConnectionFactory) =
-        TestRabbitTemplate(connectionFactory)
+        TestRabbitTemplate(connectionFactory)*/
 
 }
 
