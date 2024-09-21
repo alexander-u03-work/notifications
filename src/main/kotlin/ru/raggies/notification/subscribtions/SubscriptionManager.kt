@@ -38,18 +38,22 @@ class SubscriptionManager(
         return subscriptionRepository.save(subscription).toDTO()
     }
 
-    @Transactional(readOnly = true)
+    fun getSubscribedNotifications(userId: Long, notificationName: String): List<UserNotificationSubscription> =
+        subscriptionRepository.findAllByUserIdAndNotificationNameAndActive(userId, notificationName, true)
+            .map { it.toDTO() }
+
+    fun getSubscribedNotifications(notificationName: String): List<UserNotificationSubscription> =
+        subscriptionRepository.findByNotificationNameAndActive(notificationName, true)
+            .map { it.toDTO() }
+
     fun getUserSubscriptions(userId: Long): List<UserNotificationSubscription> =
         subscriptionRepository.findByUserId(userId)
             .map { it.toDTO() }
 
     private fun createSubscriptionEntities(userId: Long, email: String, notificationIds: List<Long>): List<NotificationSubscriptionEntity> =
-        notificationIds.map { notificationId ->
-            notificationRepository.findById(notificationId)
-                .map { notification ->
-                    NotificationSubscriptionEntity(userId, notificationId, notification, email, false)
-                }
-                .orElseThrow { throw ApplicationException("Notification with id $notificationId not found") }
-        }
+        notificationRepository.findAllByIdIn(notificationIds)
+            .map { notification ->
+                NotificationSubscriptionEntity(userId, notification.id, notification, email, false)
+            }
 
 }

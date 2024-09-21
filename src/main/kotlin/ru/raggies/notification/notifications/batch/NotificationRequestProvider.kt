@@ -6,14 +6,14 @@ import org.springframework.stereotype.Service
 import ru.raggies.notification.notifications.NotificationRequest
 import ru.raggies.notification.notifications.PersonalNotificationRequest
 import ru.raggies.notification.notifications.users.UserNotificationSubscription
-import ru.raggies.notification.notifications.users.UserNotificationManager
+import ru.raggies.notification.subscribtions.SubscriptionManager
 import java.time.Instant
 import java.util.concurrent.atomic.AtomicInteger
 import java.util.concurrent.atomic.AtomicReference
 
 @Service
 class NotificationRequestProvider(
-    private val userNotificationManager: UserNotificationManager,
+    private val userNotificationManager: SubscriptionManager,
     private val rabbitTemplate: RabbitTemplate,
     private val processingProperties: BatchProcessingProperties,
     private var notificationsBatch: AtomicReference<MutableList<NotificationProcessRequest>> = AtomicReference(mutableListOf()),
