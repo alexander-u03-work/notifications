@@ -3,6 +3,7 @@ package ru.raggies.notification.notifications.users
 import org.springframework.amqp.rabbit.core.RabbitTemplate
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
+import ru.raggies.notification.notifications.NotificationManager
 import ru.raggies.notification.notifications.NotificationProperties
 import ru.raggies.notification.notifications.NotificationRequest
 import ru.raggies.notification.notifications.PersonalNotificationRequest
@@ -10,7 +11,7 @@ import ru.raggies.notification.notifications.PersonalNotificationRequest
 @RestController
 @RequestMapping(UserNotificationController.BASE_URL)
 class UserNotificationController(
-    private val userNotificationManager: UserNotificationManager,
+    private val userNotificationManager: NotificationManager,
     private val rabbitTemplate: RabbitTemplate,
     private val properties: NotificationProperties
 ) {
