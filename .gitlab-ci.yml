@@ -7,6 +7,7 @@ variables:
   APP_NAME: raggies
   CHART_NAME: raggies
   CONTAINER_REGISTRY_USERNAME: raggies
+  NOTIFICATION_BUILD_VERSION: ${CI_JOB_ID}
 
 cache:
   paths:
@@ -37,7 +38,6 @@ build-docker:
   only:
     - main
     - develop
-  when: manual
   before_script:
     - docker login raggies.gitlab.yandexcloud.net:5050 -u ${CONTAINER_REGISTRY_USERNAME} -p ${CONTAINER_REGISTRY_TOKEN}
   script:
