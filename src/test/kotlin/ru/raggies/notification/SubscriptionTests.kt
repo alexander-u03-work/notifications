@@ -11,14 +11,10 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.test.mock.mockito.SpyBean
-import org.springframework.boot.testcontainers.service.connection.ServiceConnection
+import org.springframework.context.annotation.Import
 import org.springframework.test.context.ActiveProfiles
-import org.springframework.test.context.DynamicPropertyRegistry
-import org.springframework.test.context.DynamicPropertySource
-import org.testcontainers.containers.PostgreSQLContainer
-import org.testcontainers.containers.RabbitMQContainer
-import org.testcontainers.junit.jupiter.Container
 import org.testcontainers.junit.jupiter.Testcontainers
+import org.testcontainers.utility.TestcontainersConfiguration
 import ru.raggies.notification.notifications.NotificationProperties
 import ru.raggies.notification.notifications.PersonalNotificationRequest
 import ru.raggies.notification.notifications.sending.NotificationDeliveryProvider
@@ -30,7 +26,7 @@ import java.util.concurrent.TimeUnit
 
 @ActiveProfiles("test")
 @AutoConfigureMockMvc
-@Testcontainers
+@Import(TestNotificationApplication::class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class SubscriptionTests {
 
@@ -45,33 +41,6 @@ class SubscriptionTests {
     lateinit var notificationDeliveryProvider: NotificationDeliveryProvider
 
     private val idCounter = 1L
-
-    companion object {
-
-        @Container
-        @ServiceConnection
-        val postgresContainer: PostgreSQLContainer<*> = PostgreSQLContainer("postgres:latest")
-            .withDatabaseName("raggies-test")
-            .withUsername("postgres")
-            .withPassword("postgres")
-
-        @Container
-        @ServiceConnection
-        val rabbitContainer = RabbitMQContainer("rabbitmq:3.9-management")
-            .withUser("admin", "admin")
-            .withVhost("vhost")
-            .withPermission("vhost", "admin", ".*", ".*", ".*")
-
-
-        @JvmStatic
-        @DynamicPropertySource
-        fun dynamicProperties(registry: DynamicPropertyRegistry) {
-            registry.add("apring.datasource.url", postgresContainer::getJdbcUrl)
-
-            registry.add("spring.rabbitmq.host", rabbitContainer::getHost)
-            registry.add("spring.rabbitmq.port", rabbitContainer::getAmqpPort)
-        }
-    }
 
     @AfterEach
     fun inc() {
