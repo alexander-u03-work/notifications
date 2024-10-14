@@ -17,6 +17,7 @@ class TestNotificationApplication {
     @ServiceConnection
     fun postgresContainer(): PostgreSQLContainer<*> =
         PostgreSQLContainer("postgres:latest")
+            .withReuse(true)
             .withDatabaseName("raggies-test")
             .withUsername("postgres")
             .withPassword("postgres")
@@ -26,6 +27,7 @@ class TestNotificationApplication {
     @ServiceConnection
     fun rabbitContainer(): RabbitMQContainer =
         RabbitMQContainer("rabbitmq:3.9-management")
+            .withReuse(true)
             .withUser("admin", "admin")
             .withVhost("vhost")
             .withPermission("vhost", "admin", ".*", ".*", ".*")
