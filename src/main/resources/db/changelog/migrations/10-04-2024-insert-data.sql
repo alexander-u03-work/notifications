@@ -7,12 +7,18 @@ insert into notification_schema.notification values
     (2, 2, 'OrderNotification', true),
     (3, 1, 'SystemNotification', false),
     (4, 2, 'SystemNotification', false),
-    (5, 1, 'SendForRevisionNotification', false),
-    (6, 2, 'SendForRevisionNotification', true),
-    (7, 1, 'SendForModerationNotification', false),
-    (8, 2, 'SendForModerationNotification', true),
-    (9, 1, 'ModerationSuccededNotification', false),
-    (10, 2, 'ModerationSuccededNotification', true);
+    (5, 1, 'ProductRevisionNotification', false),
+    (6, 2, 'ProductRevisionNotification', true),
+    (7, 1, 'ProductModerationNotification', false),
+    (8, 2, 'ProductModerationNotification', true),
+    (9, 1, 'ProductPublishedNotification', false),
+    (10, 2, 'ProductPublishedNotification', true),
+    (11, 1, 'AccountRevisionNotification', false),
+    (12, 2, 'AccountRevisionNotification', true),
+    (13, 1, 'AccountModerationNotification', false),
+    (14, 2, 'AccountModerationNotification', true),
+    (15, 1, 'AccountAcceptedNotification', false),
+    (16, 2, 'AccountAcceptedNotification', true);
 
 insert into notification_schema.template values
 (1, 'OrderNotification', '<!doctype html>
@@ -55,7 +61,7 @@ insert into notification_schema.template values
         <div>Поменял статус <b>${orderStatus}</b><br>
         </body>
         </html>', 'Created'),
-(4, 'SendForRevisionNotification', '<!doctype html>
+(4, 'ProductRevisionNotification', '<!doctype html>
         <html lang="en">
         <head>
             <meta charset="UTF-8">
@@ -70,7 +76,7 @@ insert into notification_schema.template values
         <div>Комментарий модератора: <b>${comment}</b><br>
         </body>
         </html>', 'Created'),
-(5, 'SendForModerationNotification', '<!doctype html>
+(5, 'ProductModerationNotification', '<!doctype html>
         <html lang="en">
         <head>
             <meta charset="UTF-8">
@@ -83,7 +89,7 @@ insert into notification_schema.template values
         <div>Ссылка на товар: <b>${productUrl}</b><br>
         </body>
         </html>', 'Created'),
-(6, 'ModerationSuccededNotification', '<!doctype html>
+(6, 'ProductPublishedNotification', '<!doctype html>
         <html lang="en">
         <head>
             <meta charset="UTF-8">
@@ -92,7 +98,45 @@ insert into notification_schema.template values
         <title>Модерация товара</title>
         </head>
         <body>
-        <div>Товар <b>${productId}</b> <b>${productTitle}</b} успешно прошёл проверку<br>
+        <div>Товар <b>${productId}</b> <b>${productTitle}</b> успешно прошёл проверку<br>
         <div>Ссылка на товар: <b>${productUrl}</b><br>
+        </body>
+        </html>', 'Created'),
+(7, 'AccountRevisionNotification', '<!doctype html>
+        <html lang="en">
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, user-scalable=no,initialscale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+        <meta http-equiv="X-UA-Compatible" content="ie=edge">
+        <title>Модерация аккаунта</title>
+        </head>
+        <body>
+        <div>Проблема с заполнением полей информации о пользователе <b>${userId}</b><br>
+        <div><b>${issueType}</b><br>
+        <div>Комментарий модератора: <b>${comment}</b><br>
+        </body>
+        </html>', 'Created'),
+(8, 'AccountModerationNotification', '<!doctype html>
+        <html lang="en">
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, user-scalable=no,initialscale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+        <meta http-equiv="X-UA-Compatible" content="ie=edge">
+        <title>Модерация аккаунта</title>
+        </head>
+        <body>
+        <div>Пользователь <b>${userId}</b> изменил свои данные и, возможно, ожидает своей очереди на проверку<br>
+        </body>
+        </html>', 'Created'),
+(9, 'AccountAcceptedNotification', '<!doctype html>
+        <html lang="en">
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, user-scalable=no,initialscale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+        <meta http-equiv="X-UA-Compatible" content="ie=edge">
+        <title>Модерация аккаунта</title>
+        </head>
+        <body>
+        <div>Ваш аккаунт <b>${userId}</b> успешно прошёл проверку<br>
         </body>
         </html>', 'Created');
