@@ -1,4 +1,4 @@
-package ru.raggies.notification.tests
+package ru.raggies.notification.utils
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import org.springframework.core.ParameterizedTypeReference

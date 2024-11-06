@@ -20,7 +20,7 @@ class NotificationManager(
             .map { it.toDTO() }
 
     fun getUserNotifications(userId: Long): List<UserNotification> =
-        userNotificationRepository.findAllByOrderBySentAtDesc()
+        userNotificationRepository.findByUserIdOrderBySentAtDesc(userId)
             .map { it.toDTO() }
 
 }

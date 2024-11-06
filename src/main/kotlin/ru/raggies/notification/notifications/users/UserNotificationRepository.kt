@@ -5,6 +5,6 @@ import ru.raggies.notification.model.UserNotificationEntity
 
 interface UserNotificationRepository: JpaRepository<UserNotificationEntity, Long> {
 
-    fun findAllByOrderBySentAtDesc(): List<UserNotificationEntity>
+    fun findByUserIdOrderBySentAtDesc(id: Long): List<UserNotificationEntity>
 
 }

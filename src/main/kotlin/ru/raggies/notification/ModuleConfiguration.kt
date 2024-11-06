@@ -17,16 +17,25 @@ import org.springframework.batch.core.step.builder.StepBuilder
 import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
+import org.springframework.security.config.Customizer
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity
+import org.springframework.security.config.annotation.web.builders.HttpSecurity
+import org.springframework.security.config.http.SessionCreationPolicy
+import org.springframework.security.core.authority.SimpleGrantedAuthority
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter
+import org.springframework.security.web.SecurityFilterChain
 import org.springframework.transaction.PlatformTransactionManager
 import ru.raggies.notification.notifications.NotificationProperties
 import ru.raggies.notification.notifications.batch.BatchProcessingProperties
 import ru.raggies.notification.notifications.batch.NotificationProcessRequest
 import ru.raggies.notification.notifications.batch.NotificationRequestProvider
 import ru.raggies.notification.notifications.sending.NotificationDeliveryProvider
+import java.util.Locale
 
 
 @EnableBatchProcessing
 @EnableConfigurationProperties(value = [BatchProcessingProperties::class, NotificationProperties::class])
+@EnableMethodSecurity(prePostEnabled = true)
 @Configuration
 class ModuleConfiguration(
     private val notificationProperties: NotificationProperties,
@@ -58,10 +67,10 @@ class ModuleConfiguration(
     @Bean
     fun rabbitErrorHandler() = ConditionalRejectingErrorHandler()
 
-    /*@Bean
+    @Bean
     fun securityFilterChain(http: HttpSecurity): SecurityFilterChain =
         http
-            .authorizeRequests { requests ->
+            .authorizeHttpRequests { requests ->
                 requests.anyRequest().authenticated()
             }
             .oauth2ResourceServer { resource -> resource.jwt(Customizer.withDefaults()) }
@@ -73,15 +82,19 @@ class ModuleConfiguration(
         val converter = JwtAuthenticationConverter()
         converter.setPrincipalClaimName("preferred_username")
         converter.setJwtGrantedAuthoritiesConverter { jwt ->
-            val roles = jwt.getClaimAsMap("realm_access")["roles"] as List<String>
+            val roles1 = jwt.getClaimAsMap("realm_access")["roles"] as List<String>
+
+            val resourceAccess = jwt.getClaimAsMap("resource_access")["raggies-sso"] as Map<String, List<String>>
+            val roles2 = resourceAccess["roles"] as List<String>
+
+            val roles = roles1 + roles2
 
             roles
-                .filter { role -> role.startsWith("role_") }
                 .map { role -> role.uppercase(Locale.getDefault()) }
                 .map { role -> SimpleGrantedAuthority(role) }
         }
         return converter
-    }*/
+    }
 
     @Bean
     fun notificationJob(jobRepository: JobRepository, notificationStep: Step): Job =
