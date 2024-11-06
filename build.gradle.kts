@@ -25,8 +25,8 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("org.springframework.boot:spring-boot-starter-mail")
     implementation("org.springframework.boot:spring-boot-starter-freemarker")
-//    implementation("org.springframework.boot:spring-boot-starter-oauth2-resource-server")
-//    implementation("org.springframework.boot:spring-boot-starter-security")
+    implementation("org.springframework.boot:spring-boot-starter-oauth2-resource-server")
+    implementation("org.springframework.boot:spring-boot-starter-security")
 
     implementation("org.jetbrains.kotlin:kotlin-reflect")
     implementation("org.springframework.boot:spring-boot-starter-batch")
@@ -44,7 +44,8 @@ dependencies {
     testImplementation("org.testcontainers:junit-jupiter")
     testImplementation("org.testcontainers:postgresql")
     testImplementation("org.testcontainers:rabbitmq")
-    //testImplementation("org.springframework.security:spring-security-test")
+    testImplementation("com.github.dasniko:testcontainers-keycloak:3.5.1")
+    testImplementation("org.springframework.security:spring-security-test")
     testImplementation("org.springframework.batch:spring-batch-test")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }

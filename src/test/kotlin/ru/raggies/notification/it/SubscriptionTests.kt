@@ -1,8 +1,9 @@
-package ru.raggies.notification
+package ru.raggies.notification.it
 
 import org.awaitility.Awaitility
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Assertions.assertTrue
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.mockito.Mockito.*
@@ -12,14 +13,15 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.test.mock.mockito.SpyBean
 import org.springframework.context.annotation.Import
+import org.springframework.security.oauth2.jwt.Jwt
 import org.springframework.test.context.ActiveProfiles
-import org.testcontainers.junit.jupiter.Testcontainers
-import org.testcontainers.utility.TestcontainersConfiguration
+import ru.raggies.notification.helpers.JwtHelper
 import ru.raggies.notification.notifications.NotificationProperties
 import ru.raggies.notification.notifications.PersonalNotificationRequest
 import ru.raggies.notification.notifications.sending.NotificationDeliveryProvider
 import ru.raggies.notification.subscribtions.SubscribeRequest
-import ru.raggies.notification.tests.AppHelper
+import ru.raggies.notification.helpers.SubscriptionHelper
+import ru.raggies.notification.TestNotificationApplication
 import java.time.Instant
 import java.util.*
 import java.util.concurrent.TimeUnit
@@ -35,12 +37,22 @@ class SubscriptionTests {
     @Autowired
     lateinit var properties: NotificationProperties
     @Autowired
-    lateinit var appHelper: AppHelper
+    lateinit var subscriptionHelper: SubscriptionHelper
+    @Autowired
+    lateinit var jwtHelper: JwtHelper
 
     @SpyBean
     lateinit var notificationDeliveryProvider: NotificationDeliveryProvider
 
+    private lateinit var defaultJwt: Jwt
+
     private val idCounter = 1L
+
+    @BeforeEach
+    fun init() {
+        val subject = UUID.randomUUID().toString()
+        defaultJwt = jwtHelper.generateJwt(subject, 90)
+    }
 
     @AfterEach
     fun inc() {
@@ -53,7 +65,7 @@ class SubscriptionTests {
         subscribeUser(userId = idCounter)
 
         Awaitility.await().atMost(20, TimeUnit.SECONDS).untilAsserted {
-            val subscriptions = appHelper.tryToGetUsersSubscriptions(userId)
+            val subscriptions = subscriptionHelper.tryToGetUsersSubscriptions(userId, defaultJwt)
                 .groupBy { it.notification.name }
             assertTrue(subscriptions.isNotEmpty())
 
