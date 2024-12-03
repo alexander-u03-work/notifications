@@ -40,18 +40,15 @@ class SubscriptionTests {
     lateinit var subscriptionHelper: SubscriptionHelper
     @Autowired
     lateinit var jwtHelper: JwtHelper
-
     @SpyBean
     lateinit var notificationDeliveryProvider: NotificationDeliveryProvider
 
     private lateinit var defaultJwt: Jwt
-
     private val idCounter = 1L
 
     @BeforeEach
     fun init() {
-        val subject = UUID.randomUUID().toString()
-        defaultJwt = jwtHelper.generateJwt(subject, 90)
+        defaultJwt = jwtHelper.generateJwt()
     }
 
     @AfterEach
@@ -61,11 +58,10 @@ class SubscriptionTests {
 
     @Test
     fun `Should subscribe user for all notifications`() {
-        val userId = 1L
         subscribeUser(userId = idCounter)
 
         Awaitility.await().atMost(20, TimeUnit.SECONDS).untilAsserted {
-            val subscriptions = subscriptionHelper.tryToGetUsersSubscriptions(userId, defaultJwt)
+            val subscriptions = subscriptionHelper.tryToGetUsersSubscriptions(idCounter, defaultJwt)
                 .groupBy { it.notification.name }
             assertTrue(subscriptions.isNotEmpty())
 

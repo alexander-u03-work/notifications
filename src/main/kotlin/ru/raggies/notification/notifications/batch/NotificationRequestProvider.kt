@@ -48,9 +48,13 @@ class NotificationRequestProvider(
             r
         }
 
-        if (notificationsBatch.get().size == processingProperties.chunkSize) {
-            val request = JobStartRequest(1, Instant.now())
-            rabbitTemplate.convertAndSend(processingProperties.jobProcessingQueueName(), request)
+        notificationsBatch.getAndUpdate { batch ->
+            if (batch.size == processingProperties.chunkSize) {
+                val request = JobStartRequest(1, Instant.now())
+                rabbitTemplate.convertAndSend(processingProperties.jobProcessingQueueName(), request)
+                batch.clear()
+            }
+            batch
         }
     }
 

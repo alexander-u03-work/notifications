@@ -20,5 +20,13 @@ class NotificationEntity(
     @Column(nullable = false)
     val isRequired: Boolean? = null
 ) {
+
+    constructor(notification: Notification): this(
+        notification.id,
+        notification.name,
+        NotificationTypeEntity(notification.typeId, notification.typeName),
+        notification.isRequired
+    )
+
     fun toDTO() = Notification(id!!, name!!, isRequired!!, type?.id!!, type.name!!)
 }

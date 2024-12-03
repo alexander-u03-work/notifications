@@ -31,8 +31,7 @@ class TemplatesTests {
 
     @BeforeEach
     fun init() {
-        val subject = UUID.randomUUID().toString()
-        defaultJwt = jwtHelper.generateJwt(subject, 90)
+        defaultJwt = jwtHelper.generateJwt()
     }
 
     @Test

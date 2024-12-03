@@ -24,8 +24,6 @@
 
 - [ ] Я описал все значимые изменения кода в этом Merge Request и удалил ненужную информацию.
 
-/draft
-
 /assign me
 
 /assign_reviewer @raggies

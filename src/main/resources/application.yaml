@@ -69,6 +69,11 @@ app:
       distribution: ${NOTIFICATION_QUEUE:distribution-notifications}
       personal: ${NOTIFICATION_QUEUE:personal-notifications}
       subscribe-on-register: ${SUBSCRIBE_ON_REGISTER_QUEUE:subscribe-on-register}
+  security:
+    cors:
+      allowed-origins:
+        - http://localhost:3000
+        - http://localhost:80
 
 logging:
   logback:
@@ -77,23 +82,3 @@ logging:
       max-index: 10
     trigger-policy:
       max-file-size: 50MB
-
-management:
-  endpoints:
-    web:
-      exposure:
-        include: '*'
-  endpoint:
-    metrics:
-      enabled:
-        true
-    health:
-      probes:
-        enabled: true
-      show-details: always
-      enabled: true
-  health:
-    livenessState:
-      enabled: true
-    readinessState:
-      enabled: true
