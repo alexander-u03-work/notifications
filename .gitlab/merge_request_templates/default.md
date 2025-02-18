@@ -15,17 +15,12 @@
 - *https://ru.yougile.com/team/def807719416/Raggies#RAG-456*
 - *https://ru.yougile.com/team/def807719416/Raggies#RAG-525*
 
-## Тестирование
-
-- *Ссылка на ci build*.
-- *Или описание того, как был протестирован код*.
-
 ## Список самопроверки
 
 - [ ] Я описал все значимые изменения кода в этом Merge Request и удалил ненужную информацию.
 
 /assign me
 
-/assign_reviewer @raggies
+/assign_reviewer @alexander.ushakov
 
-/cc @alexander.ushakov
+/cc @raggies
