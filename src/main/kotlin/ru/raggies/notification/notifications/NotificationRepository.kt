@@ -4,6 +4,4 @@ import org.springframework.data.jpa.repository.JpaRepository
 import ru.raggies.notification.model.NotificationEntity
 
 interface NotificationRepository: JpaRepository<NotificationEntity, Long> {
-
-    fun findAllByIdIn(ids: Collection<Long>): List<NotificationEntity>
 }

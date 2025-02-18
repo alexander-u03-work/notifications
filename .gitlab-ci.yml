@@ -3,7 +3,6 @@ stages:
   - build_app
 
 variables:
-  TC_CLOUD_TOKEN: aj_tcc_svc_cF8fDf1FqgefD8BGZeej_6bxsZzpwjfRN-vcz2fM-bhon
   APP_NAME: raggies
   CHART_NAME: raggies
   CONTAINER_REGISTRY_USERNAME: raggies

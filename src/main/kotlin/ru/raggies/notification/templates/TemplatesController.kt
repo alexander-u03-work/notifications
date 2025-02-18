@@ -25,9 +25,7 @@ class TemplatesController(
 
     @PreAuthorize("hasAuthority('ADMIN')")
     @GetMapping("/name")
-    fun getTemplates(@RequestParam name: String): Template {
-        return templateManager.getTemplateByName(name) ?:
-            throw ApplicationException("Template wit $name not found")
-    }
+    fun getTemplates(@RequestParam name: String) =
+        templateManager.getTemplateByName(name)
 
 }
