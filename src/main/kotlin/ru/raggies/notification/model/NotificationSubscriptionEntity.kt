@@ -1,8 +1,10 @@
 package ru.raggies.notification.model
 
 import jakarta.persistence.*
+import ru.raggies.notification.events.user.User
 import ru.raggies.notification.notifications.Notification
-import ru.raggies.notification.notifications.users.UserNotificationSubscription
+import ru.raggies.notification.subscriptions.UserSubscription
+
 
 @Entity
 @Table(name = "user_notification_subscription", schema = "notification_schema")
@@ -27,13 +29,13 @@ class NotificationSubscriptionEntity(
     var active: Boolean? = null
 ) {
 
-    constructor(userId: Long, notification: Notification, email: String, active: Boolean): this(
-        userId,
+    constructor(user: User, notification: Notification, active: Boolean): this(
+        user.id,
         notification.id,
         NotificationEntity(notification),
-        email,
+        user.username,
         active
     )
 
-    fun toDTO() = UserNotificationSubscription(userId!!, email!!, notification?.toDTO()!!, active!!)
+    fun toDTO() = UserSubscription(userId!!, email!!, notification?.toDTO()!!, active!!)
 }

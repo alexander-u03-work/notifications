@@ -1,9 +1,7 @@
 package ru.raggies.notification.notifications
 
 import org.springframework.security.access.prepost.PreAuthorize
-import org.springframework.web.bind.annotation.GetMapping
-import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.RestController
+import org.springframework.web.bind.annotation.*
 
 @RestController
 @RequestMapping(NotificationsController.BASE_URL)
@@ -14,6 +12,11 @@ class NotificationsController(
     companion object {
         const val BASE_URL = "/api/notifications"
     }
+
+    @PreAuthorize("hasAuthority('ADMIN')")
+    @PostMapping
+    fun createNotification(@RequestBody request: CreateNotificationRequest): Notification =
+        notificationManager.createNotification(request)
 
     @PreAuthorize("hasAuthority('SELLER') or hasAuthority('ADMIN')")
     @GetMapping

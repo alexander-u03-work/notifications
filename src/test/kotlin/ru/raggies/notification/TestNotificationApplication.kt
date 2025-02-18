@@ -30,25 +30,34 @@ class TestNotificationApplication {
 
     @Bean
     fun keycloakContainer(): KeycloakContainer =
-        KeycloakContainer("keycloak/keycloak:25.0.2")
+        KeycloakContainer("keycloak/keycloak:25.0.1")
             .withRealmImportFile("realm.json")
             .withNetwork(network)
 
-    @Bean
-    @ServiceConnection
-    fun rabbitContainer(): RabbitMQContainer =
-        RabbitMQContainer("rabbitmq:3.9-management")
-            .withReuse(true)
-            .withUser("admin", "admin")
-            .withVhost("vhost")
-            .withPermission("vhost", "admin", ".*", ".*", ".*")
+//    @Bean
+//    @ServiceConnection
+//    fun rabbitContainer(): RabbitMQContainer =
+//        RabbitMQContainer("rabbitmq:3.9-management")
+//            .withReuse(true)
+//            .withUser("admin", "admin")
+//            .withVhost("vhost")
+//            .withPermission("vhost", "admin", ".*", ".*", ".*")
+//            .withNetwork(network)
 
     companion object {
         @DynamicPropertySource
-        fun postgresProperties(registry: DynamicPropertyRegistry, postgresContainer: PostgreSQLContainer<*>, keycloakContainer: KeycloakContainer) {
+        fun postgresProperties(
+            registry: DynamicPropertyRegistry,
+            postgresContainer: PostgreSQLContainer<*>,
+            keycloakContainer: KeycloakContainer,
+            rabbitContainer: RabbitMQContainer,
+        ) {
             registry.add("spring.datasource.url") { postgresContainer.jdbcUrl }
             registry.add("spring.security.oauth2.client.provider.keycloak.issuer-uri") { keycloakContainer.authServerUrl + "/realms/raggies-realm" }
             registry.add("spring.security.oauth2.resourceserver.jwt.token-uri") { keycloakContainer.authServerUrl + "/realms/raggies-realm" }
+//            registry.add("spring.rabbitmq.port") { rabbitContainer.amqpPort }
+//            registry.add("spring.rabbitmq.username") { rabbitContainer.adminUsername }
+//            registry.add("spring.rabbitmq.password") { rabbitContainer.adminPassword }
         }
     }
 

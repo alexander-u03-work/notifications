@@ -6,6 +6,3 @@ spring:
       mail:
         ssl:
           enable: false
-app:
-  batch-processing:
-    chunk-size: 2

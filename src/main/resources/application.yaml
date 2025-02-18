@@ -7,14 +7,15 @@ spring:
     url: ${DATABASE_URL:jdbc:postgresql://localhost:5432/raggies}
     username: ${DATABASE_USERNAME:postgres}
     password: ${DATABASE_PASSWORD:postgres}
+    driver-class-name: org.postgresql.Driver
   jpa:
     show-sql: false
     hibernate:
       ddl-auto: none
     properties:
       hibernate:
-        dialect: org.hibernate.dialect.PostgreSQLDialect
         default_schema: notification_schema
+        dialect: org.hibernate.dialect.PostgreSQLDialect
   liquibase:
     change-log: classpath:/db/changelog/master.yaml
     drop-first: false
@@ -60,16 +61,42 @@ app:
   batch-processing:
     chunk-size: 20
     retry-limit: 3
-    queues:
-      job-processing: ${JOB_PROCESSING_QUEUE:job-processing}
-      dead-letter: ${DLQ:dead-letter-queue}
-  notifications:
-    exchange: raggies
+  rabbitmq:
     concurrent-consumers: 5
+    exchanges:
+      users: ${MODERATION_EXCHANGE:users-exchange}
+      products: ${MODERATION_EXCHANGE:products-exchange}
+      orders: ${ORDERS_EXCHANGE:orders-exchange}
+      dlx: ${DLX:dlx}
     queues:
-      distribution: ${NOTIFICATION_QUEUE:distribution-notifications}
-      personal: ${NOTIFICATION_QUEUE:personal-notifications}
-      subscribe-on-register: ${SUBSCRIBE_ON_REGISTER_QUEUE:subscribe-on-register}
+      users-moderation:
+        queue-name: ${USERS_NOTIFICATION_QUEUE:users-moderation-notification-queue}
+        routing-keys:
+          - ${USERS_MODERATION_NOTIFICATION_ROUTING_KEY:moderation.*}
+          - ${REGISTER_NOTIFICATION_ROUTING_KEY:registration.seller.*}
+        ttl: 1000
+        max-length: 10_000
+        overflow: rejectpublish
+      users-registration:
+        queue-name: ${REGISTER_NOTIFICATION_QUEUE:users-register-queue}
+        routing-keys: ${REGISTER_NOTIFICATION_ROUTING_KEY:registration.*.create}
+        ttl: 1000
+        max-length: 10_000
+        overflow: rejectpublish
+      products-moderation:
+        queue-name: ${PRODUCTS_NOTIFICATION_QUEUE:products-moderation-notification-queue}
+        routing-keys:
+          - ${PRODUCTS_NOTIFICATION_ROUTING_KEY:moderation.*}
+          - ${PRODUCTS_CREATE_NOTIFICATION_ROUTING_KEY:create}
+        ttl: 1000
+        max-length: 10_000
+        overflow: rejectpublish
+      orders-notification:
+        queue-name: ${ORDERS_NOTIFICATION_QUEUE:orders-notification-queue}
+        routing-keys: ${ORDERS_NOTIFICATION_ROUTING_KEY:*}
+        ttl: 1000
+        max-length: 10_000
+        overflow: rejectpublish
   security:
     cors:
       allowed-origins:
@@ -77,6 +104,10 @@ app:
         - http://localhost:80
 
 logging:
+  file:
+    path: logs
+    info-name: info
+    error-name: error
   logback:
     rollingpolicy:
       min-index: 1
