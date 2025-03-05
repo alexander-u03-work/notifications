@@ -26,6 +26,14 @@ class RabbitMqConfiguration(
         TopicExchange(properties.exchanges.products)
 
     @Bean
+    fun shopsTopicExchange() =
+        TopicExchange(properties.exchanges.shops)
+
+    @Bean
+    fun defaultExchange() =
+        TopicExchange(properties.exchanges.default)
+
+    @Bean
     fun usersModerationQueue(): Queue = QueueBuilder
         .durable(properties.queues.usersModeration.queueName)
         .ttl(properties.queues.usersModeration.ttl)
@@ -57,6 +65,25 @@ class RabbitMqConfiguration(
         .durable(properties.queues.ordersNotification.queueName)
         .ttl(properties.queues.ordersNotification.ttl)
         .maxLength(properties.queues.ordersNotification.maxLength)
+        .deadLetterExchange(properties.exchanges.dlx)
+        .overflow(QueueBuilder.Overflow.rejectPublish)
+        .build()
+
+    @Bean
+    fun shopsRegistrationQueue(): Queue = QueueBuilder
+        .durable(properties.queues.shopsRegistration.queueName)
+        .ttl(properties.queues.shopsRegistration.ttl)
+        .maxLength(properties.queues.shopsRegistration.maxLength)
+        .deadLetterExchange(properties.exchanges.dlx)
+        .deadLetterRoutingKey(properties.deadLetterRoutingKey)
+        .overflow(QueueBuilder.Overflow.rejectPublish)
+        .build()
+
+    @Bean
+    fun defaultImprovementSuggestionQueue(): Queue = QueueBuilder
+        .durable(properties.queues.defaultImprovementSuggestion.queueName)
+        .ttl(properties.queues.defaultImprovementSuggestion.ttl)
+        .maxLength(properties.queues.defaultImprovementSuggestion.maxLength)
         .deadLetterExchange(properties.exchanges.dlx)
         .overflow(QueueBuilder.Overflow.rejectPublish)
         .build()
@@ -108,6 +135,24 @@ class RabbitMqConfiguration(
 
         return Declarables(bindings)
     }
+
+    @Bean
+    fun shopsRegistrationBinding(
+        shopsRegistrationQueue: Queue,
+        shopsTopicExchange: TopicExchange,
+    ): Binding = BindingBuilder
+        .bind(shopsRegistrationQueue)
+        .to(shopsTopicExchange)
+        .with(properties.queues.shopsRegistration.routingKeys.firstOrNull())
+
+    @Bean
+    fun defaultImprovementSuggestionBinding(
+        defaultImprovementSuggestionQueue: Queue,
+        defaultExchange: TopicExchange,
+    ): Binding = BindingBuilder
+        .bind(defaultImprovementSuggestionQueue)
+        .to(defaultExchange)
+        .with(properties.queues.defaultImprovementSuggestion.routingKeys.firstOrNull())
 
     @Bean
     fun messageConverter(objectMapper: ObjectMapper) =
