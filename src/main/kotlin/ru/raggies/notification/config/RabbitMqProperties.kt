@@ -6,6 +6,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties
 @ConfigurationProperties(prefix = "app.rabbitmq")
 data class RabbitMqProperties(
     val concurrentConsumers: Int,
+    val deadLetterRoutingKey: String,
     val exchanges: Exchanges,
     val queues: Queues,
 ) {
@@ -15,12 +16,16 @@ data class RabbitMqProperties(
         val usersRegistration: QueueProps,
         val productsModeration: QueueProps,
         val ordersNotification: QueueProps,
+        val shopsRegistration: QueueProps,
+        val defaultImprovementSuggestion: QueueProps
     )
 
     data class Exchanges(
         val products: String,
         val users: String,
         val orders: String,
+        val shops: String,
+        val default: String,
         val dlx: String,
     )
 

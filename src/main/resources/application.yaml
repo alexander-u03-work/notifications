@@ -63,10 +63,13 @@ app:
     retry-limit: 3
   rabbitmq:
     concurrent-consumers: 5
+    dead-letter-routing-key: .dlq
     exchanges:
       users: ${MODERATION_EXCHANGE:users-exchange}
       products: ${MODERATION_EXCHANGE:products-exchange}
       orders: ${ORDERS_EXCHANGE:orders-exchange}
+      shops: ${SHOPS_EXCHANGE:shops-exchange}
+      default: ${DEFAULT_EXCHANGE:default-exchange}
       dlx: ${DLX:dlx}
     queues:
       users-moderation:
@@ -97,6 +100,19 @@ app:
         ttl: 1000
         max-length: 10_000
         overflow: rejectpublish
+      shops-registration:
+        queue-name: ${SHOP_REGISTER_NOTIFICATION_QUEUE:shop-registration-queue}
+        routing-keys: ${SHOP_REGISTER_NOTIFICATION_ROUTING_KEY:registration.*.create}
+        ttl: 1000
+        max-length: 10_000
+        overflow: rejectpublish
+      default-improvement-suggestion:
+        queue-name: ${DEFAULT_IMPROVEMENT_SUGGESTION_QUEUE:improvement-suggestion-queue}
+        routing-keys: ${DEFAULT_IMPROVEMENT_SUGGESTION_ROUTING_KEY:suggestion.create}
+        ttl: 1000
+        max-length: 10_000
+        overflow: rejectpublish
+
   security:
     cors:
       allowed-origins:

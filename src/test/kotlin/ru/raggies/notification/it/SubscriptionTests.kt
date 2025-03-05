@@ -48,8 +48,8 @@ class SubscriptionTests {
         jwtHelper.registerUser()
     }
 
-    @Test
-    @Disabled("Fix rabbitmq container")
+    //@Test
+    //@Disabled("Fix rabbitmq container")
     fun `Should subscribe user for all notifications`() {
         val jwt = jwtHelper.generateJwt(defaultUser.id)
 
@@ -68,8 +68,8 @@ class SubscriptionTests {
             }
     }
 
-    @Test
-    @Disabled("Fix rabbitmq container")
+    //@Test
+    //@Disabled("Fix rabbitmq container")
     fun `Should publish personal notification and send message`() {
         val jwt = jwtHelper.generateJwt(defaultUser.id)
         Awaitility.await()
