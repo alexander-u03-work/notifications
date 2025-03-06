@@ -19,10 +19,10 @@ class ProductModerationEventParamsExtractor: DefaultJobParamsExtractor() {
             "productUrl" to params.getString("productUrl")!!,
         )
 
-        params.getString("issueType")?.let {
+        params.getString("issueType")?.also {
             args.put("issueType", it)
         }
-        params.getString("comment")?.let {
+        params.getString("comment")?.also {
             args.put("comment", it)
         }
 
