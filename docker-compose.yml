@@ -1,5 +1,4 @@
 services:
-
   app:
     container_name: notifications-service
     build:
@@ -8,9 +7,6 @@ services:
     ports:
       - '8180:8180'
     restart: on-failure
-    depends_on:
-      smtp:
-        condition: service_started
 
   smtp:
     image: mailhog/mailhog:v1.0.1

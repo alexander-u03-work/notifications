@@ -2,10 +2,13 @@ package ru.raggies.notification.events
 
 import org.springframework.batch.core.JobParameters
 import org.springframework.stereotype.Component
-import ru.raggies.notification.events.NotificationEventHandler.Companion.EVENT_TYPE
 
 @Component
 class DefaultJobParamsExtractor: NotificationEventJobParamsExtractor {
+
+    companion object {
+        const val EVENT_TYPE = "eventType"
+    }
 
     override fun getEventType(params: JobParameters): String =
         params.getString(EVENT_TYPE)!!

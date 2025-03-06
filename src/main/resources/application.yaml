@@ -43,21 +43,20 @@ spring:
       direct:
         default-requeue-rejected: false
   mail:
-    username: ${SMTP_USERNAME:smtp}
-    password: ${SMTP_PASSWORD:password}
-    host: ${SMTP_HOST:127.0.0.1}
-    port: ${SMTP_PORT:1025}
+    username: ${SMTP_USERNAME:info@raggies.ru}
+    password: ${SMTP_PASSWORD:eeizidrourilcxvr}
+    host: ${SMTP_HOST:smtp.yandex.ru}
+    port: ${SMTP_PORT:587}
+    protocol: smtp
     properties:
       mail:
         smtp:
           auth: true
           starttls:
             enable: true
-          transport:
-            protocol: smtp
-          ssl: enable
 
 app:
+  mail: info@raggies.ru
   batch-processing:
     chunk-size: 20
     retry-limit: 3

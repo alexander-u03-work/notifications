@@ -2,6 +2,10 @@ spring:
   jpa:
     show-sql: true
   mail:
+    username: ${SMTP_USERNAME:smtp}
+    password: ${SMTP_PASSWORD:password}
+    host: ${SMTP_HOST:127.0.0.1}
+    port: ${SMTP_PORT:1025}
     properties:
       mail:
         ssl:

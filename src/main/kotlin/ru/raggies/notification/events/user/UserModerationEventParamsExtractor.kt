@@ -17,10 +17,10 @@ class UserModerationEventParamsExtractor: DefaultJobParamsExtractor() {
             "userId" to params.getLong("userId")!!
         )
 
-        params.getString("issueType")?.let {
+        params.getString("issueType")?.also {
             args.put("issueType", it)
         }
-        params.getString("comment")?.let {
+        params.getString("comment")?.also {
             args.put("comment", it)
         }
 
