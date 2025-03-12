@@ -1,0 +1,71 @@
+---
+- name: Create dir for app
+  file:
+    path: '{{ app.install_dir }}'
+    state: directory
+
+- name: Create dir for config
+  file:
+    path: '{{ app.config_dir }}'
+    state: directory
+
+- name: Create dir for logs
+  file:
+    path: '{{ app.install_dir }}/logs'
+    state: directory
+    mode: '0777'
+
+- name: Copy application.yml to conf dir
+  template:
+    src: application.yml
+    dest: '{{ app.config_dir }}/application.yml'
+
+- name: Copy logback to conf dir
+  template:
+    src: logback.xml
+    dest: '{{ app.config_dir }}/logback.xml'
+
+- name: Setup login into registry
+  block:
+    - name: Log into private registry and force re-authorization
+      shell:
+        cmd: docker login -u {{ docker.auth.user }} -p {{ docker.auth.password }} {{ docker.url }}
+
+- name: Tear down existing services
+  ignore_errors: true
+  community.docker.docker_compose_v2:
+    project_src: '{{ app.install_dir }}'
+    remove_orphans: true
+    remove_images: all
+    state: absent
+
+- name: Copy docker-compose.yml to install dir
+  template:
+    src: docker-compose.yml
+    dest: '{{ app.install_dir }}/docker-compose.yml'
+
+- name: Start app with docker-compose
+  community.docker.docker_compose_v2:
+    project_src: '{{ app.install_dir }}'
+    project_name: raggies-notifications
+    pull: always
+    build: always
+    recreate: always
+    state: present
+
+- name: Check running
+  delegate_to: raggies_app-local
+  run_once: true
+  block:
+
+    - name: pause for 20 seconds
+      pause:
+        seconds: 20
+
+    - name: Check running notifications
+      uri:
+        url: "http://localhost:{{ app.notifications.port | default(8180) }}/actuator/health"
+        status_code: 200
+      retries: 4
+      delay: 20
+      register: notifications_output

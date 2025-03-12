@@ -1,36 +1,109 @@
 stages:
-  - test
-  - build_app
-
-variables:
-  CONTAINER_REGISTRY_USERNAME: raggies
-  NOTIFICATION_BUILD_VERSION: ${CI_JOB_ID}
+  - tests
+  - build-stage
+  - deploy-stage
+  - build-prod
+  - deploy-prod
 
 cache:
   paths:
     - .m2/repository
 
-test:
-  stage: test
+variables:
+  CONTAINER_REGISTRY_USERNAME: raggies
+  NOTIFICATIONS_BUILD_VERSION: ${CI_JOB_ID}
+
+tests:
+  stage: tests
   image: gradle:jdk17
+  variables:
+    TESTCONTAINERS_RYUK_DISABLED: "false"
+    TESTCONTAINERS_CHECKS_DISABLE: "true"
+    TESTCONTAINERS_REUSE_ENABLE: "true"
   script:
     - ./gradlew test
   after_script:
+    - docker system prune -af --volumes
     - echo "Tests finished"
   rules:
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
 
-build-docker:
-  stage: build_app
+build-stage:
+  stage: build-stage
   only:
     - main
-    - develop
+    - dev
+  variables:
+    NOTIFICATIONS_BUILD_VERSION: ${CI_PIPELINE_ID}-stage
   before_script:
-    - docker login raggies.gitlab.yandexcloud.net:5050 -u ${CONTAINER_REGISTRY_USERNAME} -p ${CONTAINER_REGISTRY_TOKEN}
+    - docker login $CI_REGISTRY -u ${CONTAINER_REGISTRY_USERNAME} -p ${CONTAINER_REGISTRY_TOKEN}
   script:
-    - docker build . -t raggies.gitlab.yandexcloud.net:5050/main/raggies-devops/raggies-notifications:${NOTIFICATION_BUILD_VERSION} -f Dockerfile
-    - docker push raggies.gitlab.yandexcloud.net:5050/main/raggies-devops/raggies-notifications:${NOTIFICATION_BUILD_VERSION}
-  after_script:
-    - echo "Build finished"
+    - docker build . -t $CI_REGISTRY/main/raggies-devops/raggies-notifications:${NOTIFICATIONS_BUILD_VERSION} -f Dockerfile
+    - docker push $CI_REGISTRY/main/raggies-devops/raggies-notifications:${NOTIFICATIONS_BUILD_VERSION}
+
+deploy-stage:
+  stage: deploy-stage
+  image: $CI_REGISTRY/main/raggies-devops/raggies-installer:latest
+  only:
+    - main
+    - dev
+  variables:
+    NOTIFICATIONS_BUILD_VERSION: ${CI_PIPELINE_ID}-stage
+    ENVIRONMENT: "stage"
+    VERBOSE_LEVEL: "v"
+  before_script:
+    - 'which ssh-agent || ( apt-get update -y && apt-get install openssh-client -y )'
+    - eval $(ssh-agent -s)
+    - echo "$STAGE_SSH_PRIVATE_KEY" | tr -d '\r' | ssh-add -
+    - mkdir -p ~/.ssh
+    - chmod 700 ~/.ssh
+    - ssh-keyscan -H $STAGE_SERVER_IP >> ~/.ssh/known_hosts
+  script:
+    - export host=$STAGE_SERVER_IP
+    - export env_layer=$ENVIRONMENT
+    - export notifications_version=$NOTIFICATIONS_BUILD_VERSION
+    - export verbose_level=$VERBOSE_LEVEL
+    - sh deploy.sh
   dependencies:
-    - test
+    - build-stage
+
+build-prod:
+  stage: build-prod
+  only:
+    refs:
+      - tags
+  when: manual
+  variables:
+    NOTIFICATIONS_BUILD_VERSION: $CI_COMMIT_TAG
+  before_script:
+    - docker login $CI_REGISTRY -u ${CONTAINER_REGISTRY_USERNAME} -p ${CONTAINER_REGISTRY_TOKEN}
+  script:
+    - docker build . -t $CI_REGISTRY/main/raggies-devops/raggies-notifications:${NOTIFICATIONS_BUILD_VERSION} -f Dockerfile
+    - docker push $CI_REGISTRY/main/raggies-devops/raggies-notifications:${NOTIFICATIONS_BUILD_VERSION}
+
+deploy-prod:
+  stage: deploy-prod
+  image: $CI_REGISTRY/main/raggies-devops/raggies-installer:latest
+  only:
+    refs:
+      - tags
+  when: manual
+  variables:
+    ENVIRONMENT: "prod"
+    VERBOSE_LEVEL: "v"
+    NOTIFICATIONS_BUILD_VERSION: $CI_COMMIT_TAG
+  before_script:
+    - 'which ssh-agent || ( apt-get update -y && apt-get install openssh-client -y )'
+    - eval $(ssh-agent -s)
+    - echo "$PROD_SSH_PRIVATE_KEY" | tr -d '\r' | ssh-add -
+    - mkdir -p ~/.ssh
+    - chmod 700 ~/.ssh
+    - ssh-keyscan -H $PROD_SERVER_IP >> ~/.ssh/known_hosts
+  script:
+    - export host=$PROD_SERVER_IP
+    - export env_layer=$ENVIRONMENT
+    - export notifications_version=$NOTIFICATIONS_BUILD_VERSION
+    - export verbose_level=$VERBOSE_LEVEL
+    - sh deploy.sh
+  dependencies:
+    - build-prod

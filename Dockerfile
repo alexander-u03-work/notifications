@@ -13,12 +13,14 @@ RUN gradle build --no-daemon --exclude-task test
 
 FROM eclipse-temurin:17-jre
 
+WORKDIR /app
+
 RUN useradd -m raggies
 
-COPY --from=build /app/build/libs/*.jar /app/raggies-notification.jar
+COPY --from=build /app/build/libs/*.jar /app/raggies-notifications.jar
 
 RUN chown -R raggies:raggies /app
 
 USER raggies
 
-ENTRYPOINT ["java", "-jar", "raggies-notification.jar"]
+ENTRYPOINT ["java", "-jar", "raggies-notifications.jar"]

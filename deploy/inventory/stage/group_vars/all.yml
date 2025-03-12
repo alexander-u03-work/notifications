@@ -1,0 +1,62 @@
+---
+
+docker:
+  need_to_prepare: false
+  url: raggies.gitlab.yandexcloud.net:5050
+  registry: "raggies.gitlab.yandexcloud.net:5050/main/raggies-devops"
+  auth:
+    user: raggies
+    password: glpat-ryxFXTmF_sPU1GPv6xf6
+
+api_gateway:
+  port: 8080
+
+app:
+  host: "{{ hostvars[groups['raggies_app'][0]].ansible_host }}"
+
+frontend:
+  main_port: 8085
+  seller_port: 8086
+  aggregator_port: 8087
+  storybook_port: 8088
+backend:
+  port: 8081
+analytic:
+  port: 8083
+notifications:
+  port: 8180
+
+postgres:
+  host: raggies-postgres
+  port: 5432
+  database: raggies
+  user: raggiesadmin
+  password: jhg7admrgw24fv21gg6289
+rabbitmq:
+  host: raggies-rabbitmq
+  user: raggiesadmin
+  password: kfgdfer35vds2378f2
+  vhost: vhost
+  port: 5672
+  admin_port: 15672
+minio:
+  host: raggies-minio
+  main_port: 9000
+  console_port: 9090
+  user: raggiesadmin
+  password: gdf3fht35ds68fch72sc
+  createbuckets: true
+  bucket: raggies-bucket
+keycloak:
+  host: raggies-keycloak
+  port: 8082
+  client_id: raggies-sso
+  client_secret: KgDj4eR8kN955djeMds66yfFfaFxZVb9
+  admin_user: raggiesadmin
+  admin_password: ts1td33g7fdg62hmbve713
+mail:
+  host: "{{ hostvars[groups['raggies_infra'][0]].ansible_host }}"
+  smtp_port: 1025
+  admin_port: 8025
+  username: raggiesadmin
+  password: yhswfeghgcvd4632hgfhvd
