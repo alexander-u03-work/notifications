@@ -1,14 +1,11 @@
-truncate notification_schema.notification cascade;
-truncate notification_schema.template;
-
 insert into notification_schema.notification values
-    (1, 1, 'SuggestionImprovementEventCreateNotification', false),
-    (2, 2, 'SuggestionImprovementEventCreateNotification', true),
-    (3, 1, 'ShopRegisterEventCreateNotification', false),
-    (4, 2, 'ShopRegisterEventCreateNotification', false);
+    (17, 1, 'SuggestionImprovementEventCreateNotification', false),
+    (18, 2, 'SuggestionImprovementEventCreateNotification', true),
+    (19, 1, 'ShopRegisterEventCreateNotification', false),
+    (20, 2, 'ShopRegisterEventCreateNotification', false);
 
 insert into notification_schema.template values
-(1, 'SuggestionImprovementEventCreateNotification', '<!doctype html>
+(10, 'SuggestionImprovementEventCreateNotification', '<!doctype html>
         <html lang="en">
         <head>
             <meta charset="UTF-8">
@@ -21,7 +18,7 @@ insert into notification_schema.template values
             <div>Предложение: <b>${suggestion}</b><br>
         </body>
         </html>', 'Created'),
-(2, 'ShopRegisterEventCreateNotification', '<html lang="en">
+(11, 'ShopRegisterEventCreateNotification', '<html lang="en">
         <head>
             <meta charset="UTF-8">
             <meta name="viewport" content="width=device-width, user-scalable=no,initialscale=1.0, maximum-scale=1.0, minimum-scale=1.0">
