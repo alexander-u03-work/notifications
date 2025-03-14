@@ -32,7 +32,7 @@ build-stage:
   stage: build-stage
   only:
     - main
-    - dev
+    - develop
   variables:
     NOTIFICATIONS_BUILD_VERSION: ${CI_PIPELINE_ID}-stage
   before_script:
@@ -46,7 +46,7 @@ deploy-stage:
   image: $CI_REGISTRY/main/raggies-devops/raggies-installer:latest
   only:
     - main
-    - dev
+    - develop
   variables:
     NOTIFICATIONS_BUILD_VERSION: ${CI_PIPELINE_ID}-stage
     ENVIRONMENT: "stage"
