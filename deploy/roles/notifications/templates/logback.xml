@@ -1,0 +1,46 @@
+<configuration>
+    <include resource="org/springframework/boot/logging/logback/defaults.xml"/>
+    <include resource="org/springframework/boot/logging/logback/console-appender.xml"/>
+
+    <property name="LOG_FILE" value="${LOG_PATH}/${name}.log"/>
+
+    <springProperty name="name" source="logging.file.name"/>
+    <springProperty name="minIndex" source="logging.logback.rollingpolicy.min-index"/>
+    <springProperty name="maxIndex" source="logging.logback.rollingpolicy.max-index"/>
+    <springProperty name="maxFileSize" source="logging.logback.trigger-policy.max-file-size"/>
+
+    <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+            <level>{{ log_level }}</level>
+        </filter>
+        <file>${LOG_PATH}/${name}.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
+            <fileNamePattern>${LOG_PATH}/${name}.%i.log</fileNamePattern>
+            <minIndex>${minIndex}</minIndex>
+            <maxIndex>${maxIndex}</maxIndex>
+        </rollingPolicy>
+        <triggeringPolicy class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
+            <maxFileSize>${maxFileSize}</maxFileSize>
+        </triggeringPolicy>
+        <encoder>
+            <pattern>${FILE_LOG_PATTERN}</pattern>
+            <charset>utf8</charset>
+        </encoder>
+    </appender>
+
+    <springProfile name="dev | test">
+        <logger name="ru.raggies" level="DEBUG" additivity="false">
+            <appender-ref ref="CONSOLE" />
+        </logger>
+        <root level="INFO">
+            <appender-ref ref="CONSOLE" />
+        </root>
+    </springProfile>
+
+    <springProfile name="!test &amp; !dev">
+        <root level="INFO">
+            <appender-ref ref="CONSOLE" />
+            <appender-ref ref="FILE" />
+        </root>
+    </springProfile>
+</configuration>

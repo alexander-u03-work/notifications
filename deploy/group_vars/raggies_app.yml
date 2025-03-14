@@ -1,0 +1,40 @@
+log_level: INFO
+
+app:
+  host: "{{ hostvars[groups['raggies_app'][0]].ansible_host }}"
+  install_dir: /data/raggies/notifications
+  config_dir: /data/raggies/notifications/conf
+  frontend:
+    main_port: "{{ frontend.main_port }}"
+    seller_port: "{{ frontend.seller_port }}"
+    aggregator_port: "{{ frontend.aggregator_port }}"
+    storybook_port: "{{ frontend.storybook_port }}"
+  backend:
+    port: "{{ backend.port }}"
+  notifications:
+    image: "{{ docker.registry }}/raggies-notifications"
+    version: "{{ notifications_version }}"
+    port: "{{ notifications.port }}"
+    db_schema: notification_schema
+  analytic:
+    port: "{{ analytic.port }}"
+  rabbitmq:
+    host: "raggies-rabbitmq"
+    port: "{{ rabbitmq.port }}"
+    vhost: "{{ rabbitmq.vhost }}"
+    username: "{{ rabbitmq.user }}"
+    password: "{{ rabbitmq.password }}"
+  mail:
+    host: "raggies-smtp"
+    port: "{{ mail.smtp_port }}"
+    username: "{{ mail.username }}"
+    password: "{{ mail.password }}"
+  db:
+    host: "jdbc:postgresql://raggies-postgres:{{ postgres.port }}/{{ postgres.database }}"
+    username: "{{ postgres.user }}"
+    password: "{{ postgres.password }}"
+  minio:
+    host: "http://raggies-minio:{{ minio.main_port }}"
+    user: "{{ minio.user }}"
+    password: "{{ minio.password }}"
+    bucket: "{{ minio.bucket }}"

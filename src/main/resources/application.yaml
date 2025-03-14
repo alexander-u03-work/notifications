@@ -2,7 +2,7 @@ server:
   port: 8180
 spring:
   application:
-    name: raggies-notification
+    name: raggies-notifications
   datasource:
     url: ${DATABASE_URL:jdbc:postgresql://localhost:5432/raggies}
     username: ${DATABASE_USERNAME:postgres}
@@ -121,8 +121,7 @@ app:
 logging:
   file:
     path: logs
-    info-name: info
-    error-name: error
+    name: raggies-notifications
   logback:
     rollingpolicy:
       min-index: 1
