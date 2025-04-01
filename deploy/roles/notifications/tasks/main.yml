@@ -1,40 +1,40 @@
 ---
 - name: Create dir for app
   file:
-    path: '{{ app.install_dir }}'
+    path: '{{ install_dir }}'
     state: directory
 
 - name: Create dir for config
   file:
-    path: '{{ app.config_dir }}'
+    path: '{{ config_dir }}'
     state: directory
 
 - name: Create dir for logs
   file:
-    path: '{{ app.install_dir }}/logs'
+    path: '{{ install_dir }}/logs'
     state: directory
     mode: '0777'
 
 - name: Copy application.yml to conf dir
   template:
-    src: application.yml
-    dest: '{{ app.config_dir }}/application.yml'
+    src: application.j2
+    dest: '{{ config_dir }}/application.yml'
 
 - name: Copy logback to conf dir
   template:
     src: logback.xml
-    dest: '{{ app.config_dir }}/logback.xml'
+    dest: '{{ config_dir }}/logback.xml'
 
 - name: Setup login into registry
   block:
     - name: Log into private registry and force re-authorization
       shell:
-        cmd: docker login -u {{ docker.auth.user }} -p {{ docker.auth.password }} {{ docker.url }}
+        cmd: docker login -u {{ docker_user }} -p {{ docker_password }} {{ docker_url }}
 
 - name: Tear down existing services
   ignore_errors: true
   community.docker.docker_compose_v2:
-    project_src: '{{ app.install_dir }}'
+    project_src: '{{ install_dir }}'
     remove_orphans: true
     remove_images: all
     state: absent
@@ -42,11 +42,11 @@
 - name: Copy docker-compose.yml to install dir
   template:
     src: docker-compose.yml
-    dest: '{{ app.install_dir }}/docker-compose.yml'
+    dest: '{{ install_dir }}/docker-compose.yml'
 
 - name: Start app with docker-compose
   community.docker.docker_compose_v2:
-    project_src: '{{ app.install_dir }}'
+    project_src: '{{ install_dir }}'
     project_name: raggies-notifications
     pull: always
     build: always
@@ -64,7 +64,7 @@
 
     - name: Check running notifications
       uri:
-        url: "http://localhost:{{ app.notifications.port | default(8180) }}/actuator/health"
+        url: "http://localhost:{{ notifications.port | default(8180) }}/actuator/health"
         status_code: 200
       retries: 4
       delay: 20

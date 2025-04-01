@@ -1,4 +1,0 @@
----
-app:
-  install_dir: /data/raggies
-  config_dir: /data/raggies/conf
