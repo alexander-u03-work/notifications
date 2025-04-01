@@ -1,62 +1,69 @@
 ---
 
-docker:
-  need_to_prepare: false
-  url: raggies.gitlab.yandexcloud.net:5050
-  registry: "raggies.gitlab.yandexcloud.net:5050/main/raggies-devops"
-  auth:
-    user: raggies
-    password: glpat-ryxFXTmF_sPU1GPv6xf6
+log_level: INFO
+
+install_dir: /data/raggies/notifications
+config_dir: /data/raggies/notifications/conf
+
+docker_need_to_prepare: false
+docker_url: raggies.gitlab.yandexcloud.net:5050
+docker_registry: "raggies.gitlab.yandexcloud.net:5050/main/raggies-devops"
 
 api_gateway:
   port: 8080
 
-app:
-  host: "{{ hostvars[groups['raggies_app'][0]].ansible_host }}"
+app_host: "{{ hostvars[groups['raggies_app'][0]].ansible_host }}"
 
 frontend:
   main_port: 8085
   seller_port: 8086
   aggregator_port: 8087
   storybook_port: 8088
+
 backend:
+  auth_type: oauth
   port: 8081
-analytic:
-  port: 8083
 notifications:
   port: 8180
+  db_schema: notification_schema
+  image: "{{ docker_registry }}/raggies-notifications"
+  version: "{{ notifications_version }}"
+analytic:
+  port: 8083
 
 postgres:
   host: raggies-postgres
+  url: "jdbc:postgresql://raggies-postgres:5432/raggies"
   port: 5432
   database: raggies
-  user: raggiesadmin
-  password: jhg7admrgw24fv21gg6289
 rabbitmq:
   host: raggies-rabbitmq
-  user: raggiesadmin
-  password: kfgdfer35vds2378f2
   vhost: vhost
   port: 5672
-  admin_port: 15672
+mail:
+  host: "raggies-smtp"
+  port: 1025
 minio:
-  host: raggies-minio
-  main_port: 9000
-  console_port: 9090
-  user: raggiesadmin
-  password: gdf3fht35ds68fch72sc
-  createbuckets: true
+  host: "http://raggies-minio:9000"
   bucket: raggies-bucket
 keycloak:
   host: raggies-keycloak
   port: 8082
-  client_id: raggies-sso
-  client_secret: KgDj4eR8kN955djeMds66yfFfaFxZVb9
-  admin_user: raggiesadmin
-  admin_password: ts1td33g7fdg62hmbve713
-mail:
-  host: "{{ hostvars[groups['raggies_infra'][0]].ansible_host }}"
-  smtp_port: 1025
-  admin_port: 8025
-  username: raggiesadmin
-  password: yhswfeghgcvd4632hgfhvd
+
+cors_allowed_origins:
+  - http://{{ app_host }}:{{ api_gateway.port | default(8080) }}
+  - http://{{ app_host }}:{{ frontend.main_port | default(8085) }}
+  - http://{{ app_host }}:{{ frontend.seller_port | default(8086) }}
+  - http://{{ app_host }}:{{ frontend.aggregator_port | default(8087) }}
+  - http://{{ app_host }}:{{ frontend.storybook_port | default(8088) }}
+  - http://{{ app_host }}:80
+  - https://{{ app_host }}:443
+  - http://localhost:3000
+  - http://raggies.ru
+  - https://raggies.ru
+  - http://seller.raggies.ru
+  - https://seller.raggies.ru
+  - http://aggregator.raggies.ru
+  - https://aggregator.raggies.ru
+  - http://stage-aggregator.raggies.ru
+  - https://stage-aggregator.raggies.ru

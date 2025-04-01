@@ -1,12 +1,12 @@
 server:
-  port: {{ app.notifications.port }}
+  port: {{ notifications.port }}
 spring:
   application:
     name: raggies-notifications
   datasource:
-    url: {{ app.db.host }}
-    username: {{ app.db.username }}
-    password: {{ app.db.password }}
+    url: {{ postgres.url }}
+    username: {{ postgres_user }}
+    password: {{ postgres_password }}
     driver-class-name: org.postgresql.Driver
   jpa:
     show-sql: false
@@ -31,11 +31,11 @@ spring:
         jwt:
           issuer-uri: http://{{ keycloak.host }}:{{ keycloak.port }}/realms/raggies-realm
   rabbitmq:
-    host: {{ app.rabbitmq.host }}
-    port: {{ app.rabbitmq.port }}
-    username: {{ app.rabbitmq.username }}
-    password: {{ app.rabbitmq.password }}
-    virtual-host: {{ app.rabbitmq.vhost }}
+    host: {{ rabbitmq.host }}
+    port: {{ rabbitmq.port }}
+    username: {{ rabbitmq_user }}
+    password: {{ rabbitmq_password }}
+    virtual-host: {{ rabbitmq.vhost }}
     template:
       retry:
         enabled: true
@@ -44,10 +44,10 @@ spring:
       direct:
         default-requeue-rejected: false
   mail:
-    username: {{ app.mail.username }}
-    password: {{ app.mail.password }}
-    host: {{ app.mail.host }}
-    port: {{ app.mail.port }}
+    username: {{ mail_user }}
+    password: {{ mail_password }}
+    host: {{ mail.host }}
+    port: {{ mail.port }}
     properties:
       mail:
         smtp:
@@ -57,6 +57,17 @@ spring:
           transport:
             protocol: smtp
           ssl: enable
+
+logging:
+  file:
+    path: logs
+    name: raggies-notifications
+  logback:
+    rollingpolicy:
+      min-index: 1
+      max-index: 10
+    trigger-policy:
+      max-file-size: 10MB
 
 app:
   mail: info@raggies.ru
@@ -114,32 +125,9 @@ app:
         ttl: 1000
         max-length: 10_000
         overflow: rejectpublish
-
   security:
     cors:
       allowed-origins:
-        - http://{{ app.host }}:{{ api_gateway.port | default(8080) }}
-        - http://{{ app.host }}:{{ app.frontend.main_port | default(8085) }}
-        - http://{{ app.host }}:{{ app.frontend.seller_port | default(8086) }}
-        - http://{{ app.host }}:{{ app.frontend.aggregator_port | default(8087) }}
-        - http://{{ app.host }}:{{ app.frontend.storybook_port | default(8088) }}
-        - http://{{ app.host }}:80
-        - https://{{ app.host }}:443
-        - http://localhost:3000
-        - http://raggies.ru
-        - https://raggies.ru
-        - http://seller.raggies.ru
-        - https://seller.raggies.ru
-        - http://aggregator.raggies.ru
-        - https://aggregator.raggies.ru
-
-logging:
-  file:
-    path: logs
-    name: raggies-notifications
-  logback:
-    rollingpolicy:
-      min-index: 1
-      max-index: 10
-    trigger-policy:
-      max-file-size: 10MB
+    {% for cors_origin in cors_allowed_origins %}
+        - {{ cors_origin }}
+    {% endfor -%}

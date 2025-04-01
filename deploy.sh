@@ -1,11 +1,13 @@
 echo "Host: $host"
-echo "Environment: $env_layer"
-echo "Notifications version: $notifications_version"
-echo "Verbose level: $verbose_level"
+echo "Environment: $ENVIRONMENT"
+echo "Notifications version: $NOTIFICATIONS_BUILD_VERSION"
+echo "Verbose level: $VERBOSE_LEVEL"
 
 ansible-playbook deploy/deploy-app.yml \
--i deploy/inventory/$env_layer/hosts \
--$verbose_level \
+-i deploy/inventory/$ENVIRONMENT/hosts \
+-$VERBOSE_LEVEL \
 -e "raggies_host=$host \
-env_layer=$env_layer \
-notifications_version=$notifications_version"
+env_layer=$ENVIRONMENT \
+notifications_version=$NOTIFICATIONS_BUILD_VERSION" \
+-e "@deploy/vault/$ENVIRONMENT.yml" \
+--vault-password-file=.vault_pass

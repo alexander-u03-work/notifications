@@ -59,10 +59,8 @@ deploy-stage:
     - chmod 700 ~/.ssh
     - ssh-keyscan -H $STAGE_SERVER_IP >> ~/.ssh/known_hosts
   script:
+    - echo "$VAULT_PASSWORD" > .vault_pass
     - export host=$STAGE_SERVER_IP
-    - export env_layer=$ENVIRONMENT
-    - export notifications_version=$NOTIFICATIONS_BUILD_VERSION
-    - export verbose_level=$VERBOSE_LEVEL
     - sh deploy.sh
   dependencies:
     - build-stage
@@ -100,10 +98,8 @@ deploy-prod:
     - chmod 700 ~/.ssh
     - ssh-keyscan -H $PROD_SERVER_IP >> ~/.ssh/known_hosts
   script:
+    - echo "$VAULT_PASSWORD" > .vault_pass
     - export host=$PROD_SERVER_IP
-    - export env_layer=$ENVIRONMENT
-    - export notifications_version=$NOTIFICATIONS_BUILD_VERSION
-    - export verbose_level=$VERBOSE_LEVEL
     - sh deploy.sh
   dependencies:
     - build-prod
