@@ -1,6 +1,6 @@
 ---
 
-log_level: INFO
+log_level: DEBUG
 
 install_dir: /data/raggies/notifications
 config_dir: /data/raggies/notifications/conf
