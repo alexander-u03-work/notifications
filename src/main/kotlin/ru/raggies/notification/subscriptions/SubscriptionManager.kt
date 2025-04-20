@@ -60,7 +60,7 @@ class SubscriptionManager(
     fun getUserSubscriptions(userId: Long): List<UserSubscription> =
         try {
             userSubscriptions.get(userId)
-        } catch (e: ExecutionException) {
+        } catch (_: ExecutionException) {
             emptyList()
         }
 

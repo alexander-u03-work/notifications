@@ -1,6 +1,7 @@
 package ru.raggies.notification.batch
 
 import freemarker.template.Template
+import org.slf4j.LoggerFactory
 import org.springframework.batch.item.Chunk
 import org.springframework.batch.item.ItemWriter
 import org.springframework.stereotype.Component
@@ -15,6 +16,10 @@ class UserNotificationSender(
     private val senders: List<NotificationSender>,
     private val freeMarkerConfigurer: FreeMarkerConfigurer,
 ): ItemWriter<NotificationBatchData> {
+
+    companion object {
+        val log = LoggerFactory.getLogger(UserNotificationSender::class.java)!!
+    }
 
     private val sendersByType by lazy {
         senders.associateBy { it.getType() }
@@ -35,6 +40,8 @@ class UserNotificationSender(
 
     private fun sendNotification(data: NotificationBatchData, template: ru.raggies.notification.templates.Template) {
         val message = buildMessage(data.notificationName, template.content, data.messageArgs)
+
+        log.debug("Sending notification with data: {} to user with email: {} and id: {}", data.messageArgs, data.email, data.userId)
 
         sendersByType[data.notificationType]
             ?.sendNotification(data, message)

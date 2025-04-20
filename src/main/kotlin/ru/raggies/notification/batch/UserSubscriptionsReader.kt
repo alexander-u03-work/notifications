@@ -1,12 +1,12 @@
 package ru.raggies.notification.batch
 
+import org.slf4j.LoggerFactory
 import org.springframework.batch.core.JobParameters
 import org.springframework.batch.item.support.AbstractItemCountingItemStreamItemReader
 import ru.raggies.notification.events.NotificationEventJobParamsExtractor
 import ru.raggies.notification.subscriptions.SubscriptionManager
 import java.util.concurrent.locks.Lock
 import java.util.concurrent.locks.ReentrantLock
-import kotlin.concurrent.withLock
 
 open class UserSubscriptionsReader(
     private val jobParameters: JobParameters,
@@ -14,6 +14,10 @@ open class UserSubscriptionsReader(
     private val defaultJobParamsExtractor: NotificationEventJobParamsExtractor,
     private val jobParamsExtractors: List<NotificationEventJobParamsExtractor>,
 ): AbstractItemCountingItemStreamItemReader<NotificationBatchData>() {
+
+    companion object {
+        val log = LoggerFactory.getLogger(UserSubscriptionsReader::class.java)!!
+    }
 
     private lateinit var iterator: Iterator<NotificationBatchData>
     private val lock: Lock = ReentrantLock()
@@ -26,7 +30,10 @@ open class UserSubscriptionsReader(
         lock.lock()
         return try {
             if (iterator.hasNext()) {
-                iterator.next()
+                val subscription = iterator.next()
+                log.debug("Reading user with id {} and email {}", subscription.userId, subscription.email)
+
+                return subscription
             } else {
                 null
             }
@@ -44,6 +51,8 @@ open class UserSubscriptionsReader(
 
         val subscriptions = subscriptionManager.getUserSubscriptions(notificationName, userIds)
             .map { data -> NotificationBatchData(data, extractor.getMessageArgs(jobParameters)) }
+
+        log.debug("Users with ids {} subscriptions: {}", userIds, subscriptions)
 
         this.iterator = subscriptions.iterator()
     }
