@@ -27,7 +27,7 @@ class SuggestionImprovementEventHandler(
         val builder = JobParametersBuilder()
             .addString("notificationName", event.getNotificationName())
             .addString("username", event.source.username)
-            .addString("suggestions", event.source.suggestions)
+            .addString("suggestion", event.source.suggestion)
             .addJobParameter("adminIds", event.adminIds, List::class.java)
 
         return builder

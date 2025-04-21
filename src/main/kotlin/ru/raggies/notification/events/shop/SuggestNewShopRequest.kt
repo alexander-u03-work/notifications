@@ -4,5 +4,5 @@ data class SuggestNewShopRequest(
     val username: String,
     val shopName: String,
     val phoneNumber: String,
-    val suggestions: String?,
+    val suggestion: String?,
 )
