@@ -31,7 +31,7 @@ open class UserSubscriptionsReader(
         return try {
             if (iterator.hasNext()) {
                 val subscription = iterator.next()
-                log.debug("Reading user with id {} and email {}", subscription.userId, subscription.email)
+                log.debug("Reading user's with id {} and email {} subscription", subscription.userId, subscription.email)
 
                 return subscription
             } else {
@@ -49,6 +49,7 @@ open class UserSubscriptionsReader(
         val notificationName = extractor.getNotificationName(jobParameters)
         val userIds = extractor.getUserIds(jobParameters)
 
+        log.debug("Starting user's subscriptions batch {}", userIds)
         val subscriptions = subscriptionManager.getUserSubscriptions(notificationName, userIds)
             .map { data -> NotificationBatchData(data, extractor.getMessageArgs(jobParameters)) }
 

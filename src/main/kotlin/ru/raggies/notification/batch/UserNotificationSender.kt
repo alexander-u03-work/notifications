@@ -31,6 +31,8 @@ class UserNotificationSender(
             .associateBy( {it.notificationName} ) {
                 templateManager.getTemplateByName(it.notificationName)
             }
+        
+        log.debug("Writing {} notifications", chunk.items)
 
         chunk.forEach {
             val template = templatesByNotificationName[it.notificationName]!!
