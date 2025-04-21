@@ -115,7 +115,7 @@ app:
         overflow: rejectpublish
       shops-registration:
         queue-name: ${SHOP_REGISTER_NOTIFICATION_QUEUE:shop-registration-queue}
-        routing-keys: ${SHOP_REGISTER_NOTIFICATION_ROUTING_KEY:registration.*.create}
+        routing-keys: ${SHOP_REGISTER_NOTIFICATION_ROUTING_KEY:registration.create}
         ttl: 1000
         max-length: 10_000
         overflow: rejectpublish
