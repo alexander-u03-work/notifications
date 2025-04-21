@@ -31,8 +31,8 @@ class ShopRegisterEventHandler(
             .addString("phoneNumber", event.source.phoneNumber)
             .addJobParameter("adminIds", event.adminIds, List::class.java)
 
-        event.source.suggestions?.let { 
-            builder.addString("suggestions", it)
+        event.source.suggestion?.let {
+            builder.addString("suggestion", it)
         }
 
         return builder

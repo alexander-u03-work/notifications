@@ -19,8 +19,8 @@ class ShopRegisterEventParamsExtractor: DefaultJobParamsExtractor() {
             "phoneNumber" to params.getString("phoneNumber")!!,
         )
 
-        params.getString("suggestions")?.let {
-            args.put("suggestions", it)
+        params.getString("suggestion")?.let {
+            args.put("suggestion", it)
         }
 
         return args
