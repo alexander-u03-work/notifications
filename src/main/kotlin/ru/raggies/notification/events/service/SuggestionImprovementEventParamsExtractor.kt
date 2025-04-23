@@ -15,7 +15,11 @@ class SuggestionImprovementEventParamsExtractor: DefaultJobParamsExtractor() {
     override fun getMessageArgs(params: JobParameters): Map<String, Any> {
         val args = mutableMapOf(
             "username" to params.getString("username")!!,
-            "suggestion" to params.getString("suggestion")!!,
+            "phoneNumber" to params.getString("phoneNumber")!!,
+            "clientSatisfaction" to params.getString("clientSatisfaction")!!,
+            "interfaceComfort" to params.getString("interfaceComfort")!!,
+            "serviceWorkComfort" to params.getString("serviceWorkComfort")!!,
+            "suggestion" to params.getString("suggestion")!!
         )
 
         return args

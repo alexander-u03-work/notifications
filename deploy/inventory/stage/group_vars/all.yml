@@ -41,8 +41,8 @@ rabbitmq:
   vhost: vhost
   port: 5672
 mail:
-  host: "raggies-smtp"
-  port: 1025
+  host: "smtp.yandex.ru"
+  port: 587
 minio:
   host: "http://raggies-minio:9000"
   bucket: raggies-bucket

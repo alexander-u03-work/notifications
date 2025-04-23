@@ -24,10 +24,15 @@ class SuggestionImprovementEventHandler(
     }
 
     override fun getJobParameters(event: SuggestionImprovementEvent): JobParametersBuilder {
+        val suggestion = event.source.suggestion ?: ""
         val builder = JobParametersBuilder()
             .addString("notificationName", event.getNotificationName())
             .addString("username", event.source.username)
-            .addString("suggestion", event.source.suggestion)
+            .addString("phoneNumber", event.source.phoneNumber)
+            .addLong("clientSatisfaction", event.source.clientSatisfaction)
+            .addLong("interfaceComfort", event.source.interfaceComfort)
+            .addLong("serviceWorkComfort", event.source.serviceWorkComfort)
+            .addString("suggestion", suggestion)
             .addJobParameter("adminIds", event.adminIds, List::class.java)
 
         return builder
