@@ -24,16 +24,14 @@ class ShopRegisterEventHandler(
     }
 
     override fun getJobParameters(event: ShopRegisterEvent): JobParametersBuilder {
+        val suggestion = event.source.suggestion ?: ""
         val builder = JobParametersBuilder()
             .addString("notificationName", event.getNotificationName())
             .addString("username", event.source.username)
             .addString("shopName", event.source.shopName)
             .addString("phoneNumber", event.source.phoneNumber)
+            .addString("suggestion", suggestion)
             .addJobParameter("adminIds", event.adminIds, List::class.java)
-
-        event.source.suggestion?.let {
-            builder.addString("suggestion", it)
-        }
 
         return builder
     }
