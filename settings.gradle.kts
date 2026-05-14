@@ -1,1 +1,1 @@
-rootProject.name = "raggies-notification"
+rootProject.name = "notification"

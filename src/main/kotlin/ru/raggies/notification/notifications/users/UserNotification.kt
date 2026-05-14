@@ -5,7 +5,7 @@ import java.time.Instant
 
 data class UserNotification(
     val id: Long,
-    val userId: Long,
+    val userSubject: String,
     val notificationName: String,
     val message: String,
     val sentAt: Instant

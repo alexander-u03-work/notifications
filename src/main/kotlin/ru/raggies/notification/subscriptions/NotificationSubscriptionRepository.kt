@@ -7,8 +7,8 @@ import ru.raggies.notification.model.NotificationSubscriptionPK
 
 interface NotificationSubscriptionRepository: JpaRepository<NotificationSubscriptionEntity, NotificationSubscriptionPK> {
 
-    fun findByUserIdAndNotificationId(userId: Long, notificationId: Long): NotificationSubscriptionEntity?
+    fun findByUserSubjectAndNotificationId(userSubject: String, notificationId: Long): NotificationSubscriptionEntity?
 
-    fun findByUserId(userId: Long): List<NotificationSubscriptionEntity>
+    fun findByUserSubject(subject: String): List<NotificationSubscriptionEntity>
 
 }

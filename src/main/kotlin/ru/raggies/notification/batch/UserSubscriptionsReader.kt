@@ -3,7 +3,7 @@ package ru.raggies.notification.batch
 import org.slf4j.LoggerFactory
 import org.springframework.batch.core.JobParameters
 import org.springframework.batch.item.support.AbstractItemCountingItemStreamItemReader
-import ru.raggies.notification.events.NotificationEventJobParamsExtractor
+import ru.raggies.notification.event.NotificationEventJobParamsExtractor
 import ru.raggies.notification.subscriptions.SubscriptionManager
 import java.util.concurrent.locks.Lock
 import java.util.concurrent.locks.ReentrantLock
@@ -31,7 +31,7 @@ open class UserSubscriptionsReader(
         return try {
             if (iterator.hasNext()) {
                 val subscription = iterator.next()
-                log.debug("Reading user's with id {} and email {} subscription", subscription.userId, subscription.email)
+                log.debug("Reading user's with id {} and email {} subscription", subscription.userSubject, subscription.email)
 
                 return subscription
             } else {
@@ -47,7 +47,7 @@ open class UserSubscriptionsReader(
         val extractor = getExtractor()
 
         val notificationName = extractor.getNotificationName(jobParameters)
-        val userIds = extractor.getUserIds(jobParameters)
+        val userIds = extractor.getUserSubjects(jobParameters)
 
         log.debug("Starting user's subscriptions batch {}", userIds)
         val subscriptions = subscriptionManager.getUserSubscriptions(notificationName, userIds)

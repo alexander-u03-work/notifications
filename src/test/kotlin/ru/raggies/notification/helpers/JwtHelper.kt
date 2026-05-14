@@ -4,12 +4,11 @@ import org.springframework.amqp.rabbit.core.RabbitTemplate
 import org.springframework.security.oauth2.jwt.Jwt
 import org.springframework.stereotype.Component
 import ru.raggies.notification.config.RabbitMqProperties
-import ru.raggies.notification.events.user.User
-import ru.raggies.notification.events.user.UserRegisterEvent
+import ru.raggies.notification.event.user.User
+import ru.raggies.notification.event.user.UserRegisterEvent
 import java.time.Instant
 import java.time.temporal.ChronoUnit
 import java.util.*
-import java.util.concurrent.atomic.AtomicLong
 
 
 @Component
@@ -18,10 +17,8 @@ class JwtHelper(
     private val properties: RabbitMqProperties
 ) {
 
-    var idCounter = AtomicLong(1)
-
     fun generateJwt(
-        userId: Long = idCounter.getAndIncrement(),
+        userSubject: String = UUID.randomUUID().toString(),
         seconds: Long = 90
     ): Jwt {
         val now = Instant.now()
@@ -29,8 +26,7 @@ class JwtHelper(
             .issuedAt(now)
             .expiresAt(now.plus(seconds, ChronoUnit.SECONDS))
             .header("alg", "none")
-            .subject(UUID.randomUUID().toString())
-            .claim("user_id", userId)
+            .subject(userSubject)
             .build()
     }
 
@@ -41,8 +37,8 @@ class JwtHelper(
     }
 
     fun getUser(
-        userId: Long = idCounter.getAndIncrement(),
-        email: String = "${userId}@raggies.ru",
-    ) = User(userId, email)
+        userSubject: String = UUID.randomUUID().toString(),
+        email: String = "${userSubject}@raggies.ru",
+    ) = User(userSubject, email)
 
 }

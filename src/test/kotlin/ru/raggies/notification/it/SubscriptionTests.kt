@@ -2,13 +2,9 @@ package ru.raggies.notification.it
 
 import org.awaitility.Awaitility
 import org.junit.jupiter.api.Assertions.assertTrue
-import org.junit.jupiter.api.BeforeEach
-import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
-import org.mockito.ArgumentMatchers.anyString
 import org.mockito.kotlin.any
 import org.mockito.kotlin.atLeastOnce
-import org.mockito.kotlin.doNothing
 import org.mockito.kotlin.verify
 import org.springframework.amqp.rabbit.core.RabbitTemplate
 import org.springframework.beans.factory.annotation.Autowired
@@ -21,8 +17,8 @@ import org.springframework.test.context.bean.override.mockito.MockitoSpyBean
 import ru.raggies.notification.TestNotificationApplication
 import ru.raggies.notification.batch.UserNotificationSender
 import ru.raggies.notification.config.RabbitMqProperties
-import ru.raggies.notification.events.user.User
-import ru.raggies.notification.events.user.UserModerationEvent
+import ru.raggies.notification.event.user.User
+import ru.raggies.notification.event.user.UserModerationEvent
 import ru.raggies.notification.helpers.JwtHelper
 import ru.raggies.notification.helpers.SubscriptionHelper
 import java.util.concurrent.TimeUnit
@@ -48,10 +44,10 @@ class SubscriptionTests {
         jwtHelper.registerUser()
     }
 
-    //@Test
+    @Test
     //@Disabled("Fix rabbitmq container")
     fun `Should subscribe user for all notifications`() {
-        val jwt = jwtHelper.generateJwt(defaultUser.id)
+        val jwt = jwtHelper.generateJwt(defaultUser.subject)
 
         Awaitility.await()
             .atMost(30, TimeUnit.SECONDS)
@@ -68,10 +64,10 @@ class SubscriptionTests {
             }
     }
 
-    //@Test
+    @Test
     //@Disabled("Fix rabbitmq container")
     fun `Should publish personal notification and send message`() {
-        val jwt = jwtHelper.generateJwt(defaultUser.id)
+        val jwt = jwtHelper.generateJwt(defaultUser.subject)
         Awaitility.await()
             .atMost(30, TimeUnit.SECONDS)
             .pollDelay(10, TimeUnit.SECONDS)
@@ -80,7 +76,7 @@ class SubscriptionTests {
                 assertTrue(subscriptions.isNotEmpty())
         }
 
-        //publishNotification(defaultUser)
+        publishNotification(defaultUser)
 
         Awaitility.await()
             .atMost(10, TimeUnit.SECONDS)

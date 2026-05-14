@@ -5,7 +5,7 @@ import ru.raggies.notification.subscriptions.UserSubscription
 
 
 data class NotificationBatchData(
-    val userId: Long,
+    val userSubject: String,
     val email: String,
     val notificationName: String,
     val notificationType: NotificationDeliveryType,
@@ -13,7 +13,7 @@ data class NotificationBatchData(
 ) {
 
     constructor(subscription: UserSubscription, messageArgs: Map<String, Any>) : this(
-        subscription.userId,
+        subscription.userSubject,
         subscription.email,
         subscription.notification.name,
         subscription.notification.typeName,

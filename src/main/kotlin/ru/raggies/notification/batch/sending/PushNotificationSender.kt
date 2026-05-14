@@ -13,7 +13,7 @@ class PushNotificationSender(
     override fun getType(): NotificationDeliveryType = NotificationDeliveryType.Push
 
     override fun sendNotification(data: NotificationBatchData, message: String) {
-        userNotificationManager.createUserNotification(data.userId, data.notificationName, message)
+        userNotificationManager.createUserNotification(data.userSubject, data.notificationName, message)
     }
 
 }

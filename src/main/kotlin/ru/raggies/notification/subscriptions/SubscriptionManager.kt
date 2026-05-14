@@ -5,7 +5,7 @@ import com.google.common.cache.CacheLoader
 import com.google.common.cache.LoadingCache
 import org.springframework.stereotype.Component
 import org.springframework.transaction.annotation.Transactional
-import ru.raggies.notification.events.user.User
+import ru.raggies.notification.event.user.User
 import ru.raggies.notification.exceptions.ApplicationException
 import ru.raggies.notification.model.NotificationSubscriptionEntity
 import ru.raggies.notification.notifications.NotificationManager
@@ -19,9 +19,10 @@ class SubscriptionManager(
     private val subscriptionRepository: NotificationSubscriptionRepository
 ) {
 
-    private val userSubscriptions: LoadingCache<Long, List<UserSubscription>> = CacheBuilder.newBuilder()
+    private val userSubscriptions: LoadingCache<String, List<UserSubscription>> = CacheBuilder.newBuilder()
         .expireAfterAccess(5, TimeUnit.MINUTES)
         .build(CacheLoader.from(::createUserSubscriptionsCache))
+
 
     @Transactional
     fun subscribeUser(user: User) {
@@ -32,13 +33,13 @@ class SubscriptionManager(
         }
         subscriptionRepository.saveAll(entities)
 
-        userSubscriptions.invalidate(user.id)
+        userSubscriptions.invalidate(user.subject)
     }
 
     @Transactional
-    fun unsubscribeUser(userId: Long, notificationId: Long): UserSubscription {
-        val subscription = subscriptionRepository.findByUserIdAndNotificationId(userId, notificationId) ?:
-            throw ApplicationException("Can not unsubscribe user with id $userId for notification with id $notificationId")
+    fun unsubscribeUser(userSubject: String, notificationId: Long): UserSubscription {
+        val subscription = subscriptionRepository.findByUserSubjectAndNotificationId(userSubject, notificationId) ?:
+            throw ApplicationException("Can not unsubscribe user with subject $userSubject for notification with id $notificationId")
 
         if (subscription.notification!!.isRequired!!) {
             throw ApplicationException("Notification with id $notificationId required to subscribe")
@@ -46,26 +47,26 @@ class SubscriptionManager(
         subscription.active = false
         val savedEntity = subscriptionRepository.save(subscription)
 
-        userSubscriptions.invalidate(savedEntity.userId!!)
+        userSubscriptions.invalidate(savedEntity.userSubject!!)
         return savedEntity.toDTO()
     }
 
-    fun getUserSubscriptions(notificationName: String, userIds: List<Long>): List<UserSubscription> =
-        userIds
-            .flatMap { userId -> getUserSubscriptions(userId) }
+    fun getUserSubscriptions(notificationName: String, userSubjects: List<String>): List<UserSubscription> =
+        userSubjects
+            .flatMap { subject -> getUserSubscriptions(subject) }
             .filter { subscription -> subscription.active }
             .filter { subscription -> notificationName == subscription.notification.name }
 
 
-    fun getUserSubscriptions(userId: Long): List<UserSubscription> =
+    fun getUserSubscriptions(userSubject: String): List<UserSubscription> =
         try {
-            userSubscriptions.get(userId)
+            userSubscriptions.get(userSubject)
         } catch (_: ExecutionException) {
             emptyList()
         }
 
-    private fun createUserSubscriptionsCache(userId: Long) =
-        subscriptionRepository.findByUserId(userId)
+    private fun createUserSubscriptionsCache(userSubject: String) =
+        subscriptionRepository.findByUserSubject(userSubject)
             .map { it.toDTO() }
 
 }

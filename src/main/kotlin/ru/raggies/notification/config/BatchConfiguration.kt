@@ -19,8 +19,8 @@ import org.springframework.transaction.PlatformTransactionManager
 import ru.raggies.notification.batch.NotificationBatchData
 import ru.raggies.notification.batch.UserNotificationSender
 import ru.raggies.notification.batch.UserSubscriptionsReader
-import ru.raggies.notification.events.DefaultJobParamsExtractor
-import ru.raggies.notification.events.NotificationEventJobParamsExtractor
+import ru.raggies.notification.event.DefaultJobParamsExtractor
+import ru.raggies.notification.event.NotificationEventJobParamsExtractor
 import ru.raggies.notification.subscriptions.SubscriptionManager
 
 

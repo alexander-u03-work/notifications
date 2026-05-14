@@ -68,7 +68,7 @@ class SecurityConfiguration(
     }
 
     @Bean
-    fun authenticationEntryPoint() = AuthenticationEntryPoint { _, response, ex ->
+    fun authenticationEntryPoint(): AuthenticationEntryPoint = AuthenticationEntryPoint { _, response, ex ->
         log.error("Attempt to get an access to private resource", ex)
         response.sendError(HttpServletResponse.SC_UNAUTHORIZED, ex.message)
     }

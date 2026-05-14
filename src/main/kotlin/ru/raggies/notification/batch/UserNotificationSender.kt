@@ -43,7 +43,7 @@ class UserNotificationSender(
     private fun sendNotification(data: NotificationBatchData, template: ru.raggies.notification.templates.Template) {
         val message = buildMessage(data.notificationName, template.content, data.messageArgs)
 
-        log.debug("Sending notification with data: {} to user with email: {} and id: {}", data.messageArgs, data.email, data.userId)
+        log.debug("Sending notification with data: {} to user with email: {} and userSubject: {}", data.messageArgs, data.email, data.userSubject)
 
         sendersByType[data.notificationType]
             ?.sendNotification(data, message)

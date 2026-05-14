@@ -11,17 +11,17 @@ class UserNotificationManager(
 ) {
 
     @Transactional
-    fun createUserNotification(userId: Long, notificationName: String, message: String) {
+    fun createUserNotification(userSubject: String, notificationName: String, message: String) {
         userNotificationRepository.save(UserNotificationEntity(
-            userId = userId,
+            userSubject = userSubject,
             notificationName = notificationName,
             message = message,
             sentAt = Instant.now(),
         ))
     }
 
-    fun getUserNotifications(userId: Long): List<UserNotification> =
-        userNotificationRepository.findByUserIdOrderBySentAtDesc(userId)
+    fun getUserNotifications(userSubject: String): List<UserNotification> =
+        userNotificationRepository.findByUserSubjectOrderBySentAtDesc(userSubject)
             .map { it.toDTO() }
 
 }

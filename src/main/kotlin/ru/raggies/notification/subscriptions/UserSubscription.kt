@@ -4,7 +4,7 @@ import ru.raggies.notification.notifications.Notification
 
 
 data class UserSubscription(
-    val userId: Long,
+    val userSubject: String,
     val email: String,
     val notification: Notification,
     val active: Boolean

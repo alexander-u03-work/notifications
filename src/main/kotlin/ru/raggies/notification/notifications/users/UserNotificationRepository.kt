@@ -6,6 +6,6 @@ import java.util.*
 
 interface UserNotificationRepository: JpaRepository<UserNotificationEntity, Long> {
 
-    fun findByUserIdOrderBySentAtDesc(id: Long): List<UserNotificationEntity>
+    fun findByUserSubjectOrderBySentAtDesc(subject: String): List<UserNotificationEntity>
 
 }
