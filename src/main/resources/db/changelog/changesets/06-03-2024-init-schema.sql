@@ -19,17 +19,17 @@ create table notification_schema.notification(
 );
 
 create table notification_schema.user_notification_subscription(
-    user_id bigserial not null,
+    user_subject text not null,
     notification_id bigserial references notification_schema.notification(id),
     email text not null,
     active boolean not null,
 
-    primary key (user_id, notification_id)
+    primary key (user_subject, notification_id)
 );
 
 create table notification_schema.user_notification(
     id bigserial primary key,
-    user_id bigint not null,
+    user_subject text not null,
     notification_name text not null,
     message text not null,
     sent_at timestamp not null

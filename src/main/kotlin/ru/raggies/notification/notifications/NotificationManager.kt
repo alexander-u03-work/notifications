@@ -3,9 +3,9 @@ package ru.raggies.notification.notifications
 import com.google.common.cache.CacheBuilder
 import com.google.common.cache.CacheLoader
 import com.google.common.cache.LoadingCache
+import exception.ApplicationException
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
-import ru.raggies.notification.exceptions.ApplicationException
 import ru.raggies.notification.model.NotificationEntity
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicLong
@@ -33,7 +33,7 @@ class NotificationManager(
             type = notificationType,
             isRequired = request.isRequired
         ))
-        version.getAndDecrement()
+        version.getAndIncrement()
 
         return savedEntity.toDTO()
     }
@@ -46,7 +46,7 @@ class NotificationManager(
             .map { it.toDTO() }
 
     private fun createNotificationsCache(): List<Notification> {
-        version.getAndDecrement()
+        version.getAndIncrement()
 
         return notificationRepository.findAll()
             .map { it.toDTO() }

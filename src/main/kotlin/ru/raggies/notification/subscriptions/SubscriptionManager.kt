@@ -3,10 +3,10 @@ package ru.raggies.notification.subscriptions
 import com.google.common.cache.CacheBuilder
 import com.google.common.cache.CacheLoader
 import com.google.common.cache.LoadingCache
+import exception.ApplicationException
 import org.springframework.stereotype.Component
 import org.springframework.transaction.annotation.Transactional
 import ru.raggies.notification.event.user.User
-import ru.raggies.notification.exceptions.ApplicationException
 import ru.raggies.notification.model.NotificationSubscriptionEntity
 import ru.raggies.notification.notifications.NotificationManager
 

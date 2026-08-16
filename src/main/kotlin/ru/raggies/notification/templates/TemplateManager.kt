@@ -1,7 +1,7 @@
 package ru.raggies.notification.templates
 
+import exception.ApplicationException
 import org.springframework.stereotype.Service
-import ru.raggies.notification.exceptions.ApplicationException
 
 @Service
 class TemplateManager(

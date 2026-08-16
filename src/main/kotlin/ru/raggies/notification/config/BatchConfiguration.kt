@@ -15,6 +15,8 @@ import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.core.task.SimpleAsyncTaskExecutor
 import org.springframework.core.task.TaskExecutor
+import org.springframework.core.task.support.TaskExecutorAdapter
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor
 import org.springframework.transaction.PlatformTransactionManager
 import ru.raggies.notification.batch.NotificationBatchData
 import ru.raggies.notification.batch.UserNotificationSender
@@ -22,6 +24,7 @@ import ru.raggies.notification.batch.UserSubscriptionsReader
 import ru.raggies.notification.event.DefaultJobParamsExtractor
 import ru.raggies.notification.event.NotificationEventJobParamsExtractor
 import ru.raggies.notification.subscriptions.SubscriptionManager
+import java.util.concurrent.Executors
 
 
 @EnableConfigurationProperties(value = [BatchProcessingProperties::class])
@@ -64,7 +67,13 @@ class BatchConfiguration(
         defaultJobParamsExtractor: DefaultJobParamsExtractor,
         paramsExtractors: List<NotificationEventJobParamsExtractor>
     ): UserSubscriptionsReader {
-        val reader = UserSubscriptionsReader(jobParameters, subscriptionManager, defaultJobParamsExtractor, paramsExtractors)
+        val reader = UserSubscriptionsReader(
+            jobParameters,
+            subscriptionManager,
+            defaultJobParamsExtractor,
+            paramsExtractors
+        )
+
         reader.isSaveState = false
         reader.name = "sendingNotification"
 
@@ -73,10 +82,9 @@ class BatchConfiguration(
 
     @Bean
     fun taskExecutor(): TaskExecutor {
-        val executor = SimpleAsyncTaskExecutor("spring-batch-job-")
-        executor.concurrencyLimit = 3
+        val executor = Executors.newFixedThreadPool(3)
 
-        return executor
+        return TaskExecutorAdapter(executor)
     }
 
     @Bean

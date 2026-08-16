@@ -45,8 +45,10 @@ class SecurityConfiguration(
                         "/swagger-ui/**",
                         "/swagger-ui.html",
                         "/actuator/**"
-                    ).permitAll()
-                    .anyRequest().authenticated()
+                    )
+                    .permitAll()
+                    .anyRequest()
+                    .authenticated()
             }
             .oauth2ResourceServer { resource -> resource.jwt { jwtConfigurer ->
                 jwtConfigurer.jwtAuthenticationConverter(authenticationConverter())

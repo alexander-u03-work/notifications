@@ -7,7 +7,7 @@ import java.io.Serializable
 @Embeddable
 class NotificationSubscriptionPK(
     @Column
-    val userId: String? = null,
+    val userSubject: String? = null,
     @Column
     val notificationId: Long? = null
 ): Serializable
