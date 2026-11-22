@@ -15,7 +15,6 @@ services:
       DATABASE_PASSWORD: ${POSTGRES_PASSWORD:-password}
       SPRING_RABBITMQ_HOST: rabbitmq
       JWT_ISSUER_URI: http://localhost:8000
-      SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_JWK_SET_URI: http://casdoor:8000/.well-known/jwks
       SMTP_HOST: smtp
       SMTP_PORT: 1025
       SPRING_MAIL_PROPERTIES_MAIL_SMTP_AUTH: "false"
