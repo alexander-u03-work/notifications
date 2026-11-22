@@ -52,7 +52,7 @@ jobs:
             sleep 2
           done
 
-          docker compose --profile app logs notification
+          docker compose --profile app logs notifications-service
           docker compose --profile app down -v
 
           $healthy
