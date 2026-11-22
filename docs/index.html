@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Как устроен сервис уведомлений Raggies Notify.">
+<title>Raggies Notify — архитектура сервиса</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="top"><div class="wrap bar">
+<a class="brand" href="#top"><span class="logo" aria-hidden="true">∿</span> Raggies<span>Notify</span></a>
+<span class="project">Курсовой проект</span>
+</div></header>
+<main class="wrap" id="top">
+<section class="hero" aria-labelledby="title">
+<div class="intro">
+<h1 id="title">Сервис <em>уведомлений</em></h1>
+<p>Raggies Notify получает события приложения через RabbitMQ и обрабатывает их для отправки уведомлений.</p>
+</div>
+</section>
+<section class="panel" aria-labelledby="flow-title">
+<h2 id="flow-title">Как это работает</h2>
+<ol class="flow">
+<li>
+<span class="icon server" aria-hidden="true"></span>
+<h3>Главный сервер</h3>
+<p>Публикует событие приложения.</p>
+</li>
+<li>
+<span class="icon broker" aria-hidden="true"></span>
+<h3>RabbitMQ</h3>
+<p>Ставит событие в очередь и передаёт его сервису.</p>
+</li>
+<li>
+<span class="icon mail" aria-hidden="true"></span>
+<h3>Raggies Notify</h3>
+<p>Обрабатывает событие и формирует уведомление.</p>
+</li>
+</ol>
+<aside class="auth" aria-labelledby="auth-title">
+<span class="icon lock" aria-hidden="true"></span>
+<div><h3 id="auth-title">Casdoor</h3><p>Компонент проекта для входа и выдачи токенов.</p></div>
+</aside>
+</section>
+</main>
+</body>
+</html>
