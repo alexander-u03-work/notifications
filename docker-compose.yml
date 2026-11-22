@@ -17,8 +17,6 @@ services:
       JWT_ISSUER_URI: http://localhost:8000
       SMTP_HOST: smtp
       SMTP_PORT: 1025
-      SPRING_MAIL_PROPERTIES_MAIL_SMTP_AUTH: "false"
-      SPRING_MAIL_PROPERTIES_MAIL_SMTP_STARTTLS_ENABLE: "false"
     ports:
       - "127.0.0.1:8180:8180"
     depends_on:
