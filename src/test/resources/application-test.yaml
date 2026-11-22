@@ -14,8 +14,3 @@ spring:
       mail:
         ssl:
           enable: false
-casdoor:
-  client-id: raggies-notification
-  client-secret: notification-test-client-secret
-  organization-name: raggies-org
-  application-name: raggies-notification

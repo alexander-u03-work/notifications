@@ -1,5 +1,5 @@
 server:
-  port: 8180
+  port: ${PORT:8180}
 spring:
   application:
     name: raggies-notifications
@@ -57,7 +57,7 @@ spring:
             enable: true
 
 app:
-  mail: {APP_MAIL:info@raggies.ru}
+  mail: ${APP_MAIL:-info@raggies.ru}
   batch-processing:
     chunk-size: 20
     retry-limit: 3
