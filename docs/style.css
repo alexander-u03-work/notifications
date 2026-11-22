@@ -39,6 +39,11 @@ h3 { font-size: 1.1rem; }
 .auth { display: flex; align-items: center; gap: 1rem; padding: .85rem 1rem; border: 1px solid var(--line); border-radius: 12px; }
 .lock { flex: none; width: 21px; height: 15px; margin: 5px 3px 0; }
 .lock::before { content: ""; position: absolute; left: 4px; right: 4px; height: 8px; bottom: 100%; border: 1px solid currentColor; border-radius: 8px 8px 0 0; }
+.render-card { display: flex; align-items: center; justify-content: space-between; gap: 1.5rem; margin-top: 1rem; padding: clamp(1rem, 3vw, 2rem); border: 1px solid var(--line); border-radius: 18px; background: linear-gradient(120deg, #191d27, #211c32); }
+.render-copy .eyebrow { margin-bottom: .35rem; color: var(--accent); font-size: .8rem; font-weight: 700; letter-spacing: .12em; }
+.render-copy > p:last-child { margin-top: .35rem; color: var(--muted); }
+.render-button { flex: none; padding: .75rem 1rem; border: 1px solid #8570be; border-radius: 10px; background: var(--accent); color: #211741; font-weight: 700; text-decoration: none; text-align: center; }
+.render-button:hover { background: #c9baff; }
 :focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
 @media (max-width: 740px) {
   .wrap { width: calc(100% - 2rem); }
@@ -46,4 +51,6 @@ h3 { font-size: 1.1rem; }
   .flow li { min-height: auto; }
   .flow li + li::before { width: 1px; height: 1.25rem; top: auto; bottom: calc(100% + .3rem); left: 50%; }
   .flow li + li::after { top: auto; right: auto; bottom: calc(100% + .3rem); left: calc(50% - 3px); transform: rotate(135deg); }
+  .render-card { align-items: stretch; flex-direction: column; }
+  .render-button { align-self: flex-start; }
 }

@@ -24,25 +24,34 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Ensure static site exists
+      - name: Configure Render link
         env:
           RENDER_PUBLIC_URL: ${{ vars.RENDER_PUBLIC_URL }}
         run: |
-          if [ ! -f docs/index.html ]; then
-            mkdir -p docs
-            cat <<EOF > docs/index.html
-          <!doctype html>
-          <html lang="ru">
-          <head><meta charset="utf-8"><title>raggies-notifications</title></head>
-          <body style="font-family: sans-serif; max-width: 720px; margin: 40px auto;">
-            <h1>raggies-notifications</h1>
-            <p>Сервис уведомлений (Spring Boot + PostgreSQL + RabbitMQ + Casdoor).</p>
-            <p>Сборка: <code>${{ github.sha }}</code></p>
-            ${RENDER_PUBLIC_URL:+<p><a href="${RENDER_PUBLIC_URL}/swagger-ui.html">Открыть Swagger UI</a></p>}
-          </body>
-          </html>
-          EOF
-          fi
+          python3 - <<'PY'
+          import os
+          from pathlib import Path
+          from urllib.parse import urlparse
+
+          page = Path("docs/index.html")
+          html = page.read_text(encoding="utf-8")
+          start_marker = "<!-- render-link:start -->"
+          end_marker = "<!-- render-link:end -->"
+          start = html.index(start_marker)
+          end = html.index(end_marker, start) + len(end_marker)
+          block = html[start:end]
+          render_url = os.environ.get("RENDER_PUBLIC_URL", "").strip().rstrip("/")
+
+          if render_url:
+              parsed = urlparse(render_url)
+              if parsed.scheme != "https" or not parsed.netloc or parsed.path not in ("", "/") or parsed.query or parsed.fragment:
+                  raise SystemExit("RENDER_PUBLIC_URL must be the Render service base URL, without a path.")
+              block = block.replace(start_marker, "").replace(end_marker, "").replace("__RENDER_PUBLIC_URL__", render_url)
+          else:
+              block = ""
+
+          page.write_text(html[:start] + block + html[end:], encoding="utf-8")
+          PY
 
       - name: Setup Pages
         uses: actions/configure-pages@v5
