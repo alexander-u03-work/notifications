@@ -3,10 +3,9 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="description" content="Интерактивная демонстрация сервиса уведомлений для курсового проекта.">
-<title>Raggies Notify — путь уведомления</title>
+<meta name="description" content="Как устроен сервис уведомлений Raggies Notify.">
+<title>Raggies Notify — архитектура сервиса</title>
 <link rel="stylesheet" href="style.css">
-<script src="demo.js" defer></script>
 </head>
 <body>
 <header class="top"><div class="wrap bar">
@@ -15,35 +14,35 @@
 </div></header>
 <main class="wrap" id="top">
 <section class="hero" aria-labelledby="title">
-<div class="intro"><div class="eyebrow"><span></span> ИНТЕРАКТИВНОЕ ДЕМО</div>
-<h1 id="title">Путь<br><em>уведомления</em></h1>
-<p>Запустите тестовое сообщение и проследите, как оно проходит от запроса до получателя.</p></div>
-<div class="art" aria-hidden="true"><div class="orbit outer"></div><div class="orbit inner"></div><div class="orbit core"></div><i class="spark one"></i><i class="spark two"></i><i class="spark three"></i><div class="envelope"><b></b></div></div>
+<div class="intro">
+<h1 id="title">Сервис <em>уведомлений</em></h1>
+<p>Raggies Notify получает события приложения через RabbitMQ и обрабатывает их для отправки уведомлений.</p>
+</div>
 </section>
-<section class="studio" aria-label="Симулятор уведомлений">
-<form class="panel settings" id="demo">
-<h2>Тестовое сообщение</h2>
-<label for="message">Текст уведомления</label>
-<textarea id="message" required maxlength="160" rows="2">Ваш отчёт готов к просмотру.</textarea>
-<label for="scenario">Сценарий доставки</label>
-<select id="scenario"><option value="success">Успешная доставка</option><option value="retry">Временный сбой и повтор</option><option value="failure">Ошибка доставки</option></select>
-<button id="launch" type="submit">Запустить симуляцию</button>
-<p class="hint">Сообщение обрабатывается в браузере.</p>
-</form>
-<section class="panel monitor" aria-labelledby="flow-title">
-<div class="monitor-head"><h2 id="flow-title">Маршрут доставки</h2><span id="status" role="status">Ожидание</span></div>
-<ol class="flow" id="flow">
-<li><span class="node" aria-hidden="true"></span><div><strong>Приём запроса</strong><small>Сервис получает сообщение</small></div></li>
-<li><span class="node" aria-hidden="true"></span><div><strong>Очередь</strong><small>Сообщение ждёт обработки</small></div></li>
-<li><span class="node" aria-hidden="true"></span><div><strong>Обработка</strong><small>Обработчик готовит отправку</small></div></li>
-<li><span class="node" aria-hidden="true"></span><div><strong>Доставка</strong><small>Фиксируется результат отправки</small></div></li>
+<section class="panel" aria-labelledby="flow-title">
+<h2 id="flow-title">Как это работает</h2>
+<ol class="flow">
+<li>
+<span class="icon server" aria-hidden="true"></span>
+<h3>Главный сервер</h3>
+<p>Публикует событие приложения.</p>
+</li>
+<li>
+<span class="icon broker" aria-hidden="true"></span>
+<h3>RabbitMQ</h3>
+<p>Ставит событие в очередь и передаёт его сервису.</p>
+</li>
+<li>
+<span class="icon mail" aria-hidden="true"></span>
+<h3>Raggies Notify</h3>
+<p>Обрабатывает событие и формирует уведомление.</p>
+</li>
 </ol>
-<div class="log-head">Журнал событий</div>
-<ol class="log" id="events" aria-label="Журнал событий" aria-live="polite"><li class="muted">События появятся после запуска.</li></ol>
-<div id="receipt" class="receipt" hidden><strong>Что увидит получатель</strong><p></p></div>
-</section>
+<aside class="auth" aria-labelledby="auth-title">
+<span class="icon lock" aria-hidden="true"></span>
+<div><h3 id="auth-title">Casdoor</h3><p>Компонент проекта для входа и выдачи токенов.</p></div>
+</aside>
 </section>
 </main>
-<footer class="wrap">Raggies Notify <span>·</span> Демонстрация работы сервиса уведомлений</footer>
 </body>
 </html>
