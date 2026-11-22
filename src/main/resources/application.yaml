@@ -31,10 +31,11 @@ spring:
         jwt:
           issuer-uri: ${JWT_ISSUER_URI:http://localhost:8000}
   rabbitmq:
-    virtual-host: vhost
-    port: 5672
-    username: admin
-    password: admin
+    host: ${RABBITMQ_HOST:localhost}
+    port: ${RABBITMQ_PORT:5672}
+    virtual-host: ${RABBITMQ_VHOST:vhost}
+    username: ${RABBITMQ_USERNAME:admin}
+    password: ${RABBITMQ_PASSWORD:admin}
     template:
       retry:
         enabled: true
@@ -56,7 +57,7 @@ spring:
             enable: true
 
 app:
-  mail: info@raggies.ru
+  mail: {APP_MAIL:info@raggies.ru}
   batch-processing:
     chunk-size: 20
     retry-limit: 3

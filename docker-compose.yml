@@ -2,7 +2,6 @@ name: raggies-coursework-auth
 
 services:
   app:
-    profiles: [app]
     container_name: notifications-service
     image: ${NOTIFICATION_IMAGE:-raggies-notification:local}
     build:
@@ -12,7 +11,7 @@ services:
         BUILD_COMMIT: ${BUILD_COMMIT:-local}
     environment:
       DATABASE_URL: jdbc:postgresql://postgres:5432/raggies
-      DATABASE_USERNAME: postgres
+      DATABASE_USERNAME: ${POSTGRES_USERNAME:postgres}
       DATABASE_PASSWORD: ${POSTGRES_PASSWORD:-password}
       SPRING_RABBITMQ_HOST: rabbitmq
       JWT_ISSUER_URI: http://localhost:8000
