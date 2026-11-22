@@ -3,6 +3,8 @@ spring:
     hikari:
       connectionTimeout: 2000
       maximum-pool-size: 100
+  rabbitmq:
+    virtual-host: /
   mail:
     username: ${SMTP_USERNAME:smtp}
     password: ${SMTP_PASSWORD:password}
@@ -12,3 +14,8 @@ spring:
       mail:
         ssl:
           enable: false
+casdoor:
+  client-id: raggies-notification
+  client-secret: notification-test-client-secret
+  organization-name: raggies-org
+  application-name: raggies-notification

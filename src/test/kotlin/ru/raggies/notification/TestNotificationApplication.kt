@@ -1,16 +1,18 @@
 package ru.raggies.notification
 
-import dasniko.testcontainers.keycloak.KeycloakContainer
 import org.springframework.amqp.rabbit.annotation.EnableRabbit
+import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.boot.fromApplication
 import org.springframework.boot.test.context.TestConfiguration
 import org.springframework.boot.testcontainers.service.connection.ServiceConnection
 import org.springframework.context.annotation.Bean
-import org.springframework.test.context.DynamicPropertyRegistry
-import org.springframework.test.context.DynamicPropertySource
+import org.springframework.test.context.DynamicPropertyRegistrar
+import org.testcontainers.containers.GenericContainer
 import org.testcontainers.containers.Network
 import org.testcontainers.containers.PostgreSQLContainer
 import org.testcontainers.containers.RabbitMQContainer
+import org.testcontainers.containers.wait.strategy.Wait
+import org.testcontainers.utility.MountableFile
 
 @EnableRabbit
 @TestConfiguration(proxyBeanMethods = false)
@@ -18,48 +20,48 @@ class TestNotificationApplication {
 
     private val network = Network.newNetwork()
 
+
     @Bean
     @ServiceConnection
     fun postgresContainer(): PostgreSQLContainer<*> =
-        PostgreSQLContainer("postgres:latest")
-            .withReuse(true)
+        PostgreSQLContainer("postgres:16-alpine")
             .withDatabaseName("raggies-test")
             .withUsername("postgres")
             .withPassword("postgres")
+            .withNetworkAliases("postgres")
+            .withExposedPorts(5432)
+
+    @Bean
+    fun casdoorContainer(): GenericContainer<*>
+        = GenericContainer("casbin/casdoor-all-in-one:4.30.0")
+            .withExposedPorts(8000)
+            .withCopyFileToContainer(
+                MountableFile.forClasspathResource("casdoor/init_data.json"),
+                "/casdoor/init_data.json"
+            )
+            .waitingFor(Wait.forHttp("/.well-known/openid-configuration").forStatusCode(200))
+
+
+
+    @Bean
+    @ServiceConnection
+    fun rabbitContainer(): RabbitMQContainer =
+        RabbitMQContainer("rabbitmq:management")
+            .withAdminUser("notification-tests")
+            .withAdminPassword("notification-tests")
             .withNetwork(network)
 
     @Bean
-    fun keycloakContainer(): KeycloakContainer =
-        KeycloakContainer("keycloak/keycloak:25.0.1")
-            .withRealmImportFile("realm.json")
-            .withNetwork(network)
+    fun casdoorProperties(
+        casdoorContainer: GenericContainer<*>
+    ): DynamicPropertyRegistrar =
+        DynamicPropertyRegistrar { registry ->
+            val casdoorUrl = {
+                "http://${casdoorContainer.host}:${casdoorContainer.getMappedPort(8000)}"
+            }
 
-//    @Bean
-//    @ServiceConnection
-//    fun rabbitContainer(): RabbitMQContainer =
-//        RabbitMQContainer("rabbitmq:3.9-management")
-//            .withReuse(true)
-//            .withUser("admin", "admin")
-//            .withVhost("vhost")
-//            .withPermission("vhost", "admin", ".*", ".*", ".*")
-//            .withNetwork(network)
-
-    companion object {
-        @DynamicPropertySource
-        fun postgresProperties(
-            registry: DynamicPropertyRegistry,
-            postgresContainer: PostgreSQLContainer<*>,
-            keycloakContainer: KeycloakContainer,
-            rabbitContainer: RabbitMQContainer,
-        ) {
-            registry.add("spring.datasource.url") { postgresContainer.jdbcUrl }
-            registry.add("spring.security.oauth2.client.provider.keycloak.issuer-uri") { keycloakContainer.authServerUrl + "/realms/raggies-realm" }
-            registry.add("spring.security.oauth2.resourceserver.jwt.token-uri") { keycloakContainer.authServerUrl + "/realms/raggies-realm" }
-//            registry.add("spring.rabbitmq.port") { rabbitContainer.amqpPort }
-//            registry.add("spring.rabbitmq.username") { rabbitContainer.adminUsername }
-//            registry.add("spring.rabbitmq.password") { rabbitContainer.adminPassword }
+            registry.add("spring.security.oauth2.resourceserver.jwt.issuer-uri", casdoorUrl)
         }
-    }
 
 }
 

@@ -1,17 +1,17 @@
-FROM gradle:latest AS BUILD
+FROM eclipse-temurin:21-jdk AS source
 
 WORKDIR /app
 
 COPY gradle gradle
-COPY build.gradle.kts settings.gradle.kts gradlew.bat ./
+COPY build.gradle.kts settings.gradle.kts gradle.properties gradlew ./
+COPY src src
 
-RUN gradle dependencies --no-daemon
+FROM source AS build
 
-COPY . .
+ARG BUILD_COMMIT=local
+RUN ./gradlew --no-daemon bootJar
 
-RUN gradle build --no-daemon --exclude-task test
-
-FROM eclipse-temurin:17-jre
+FROM eclipse-temurin:21-jre
 
 WORKDIR /app
 

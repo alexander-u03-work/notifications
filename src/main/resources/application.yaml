@@ -29,7 +29,7 @@ spring:
     oauth2:
       resourceserver:
         jwt:
-          issuer-uri: http://localhost:9090/realms/raggies-realm
+          issuer-uri: ${JWT_ISSUER_URI:http://localhost:8000}
   rabbitmq:
     virtual-host: vhost
     port: 5672
@@ -44,7 +44,7 @@ spring:
         default-requeue-rejected: false
   mail:
     username: ${SMTP_USERNAME:info@raggies.ru}
-    password: ${SMTP_PASSWORD:eeizidrourilcxvr}
+    password: ${SMTP_PASSWORD:}
     host: ${SMTP_HOST:smtp.yandex.ru}
     port: ${SMTP_PORT:587}
     protocol: smtp

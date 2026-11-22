@@ -11,13 +11,19 @@ group = "ru.raggies"
 version = "0.0.1-SNAPSHOT"
 description = "notification"
 
+kotlin {
+    jvmToolchain(21)
+}
+
 repositories {
     mavenCentral()
     mavenLocal()
+
+    maven { url = uri("https://jitpack.io") }
 }
 
 dependencies {
-    implementation("ru.raggies:common:1.0-SNAPSHOT")
+    implementation("com.github.37hulk37:raggies-common:1.0.0")
 
     implementation("org.springframework.boot:spring-boot-starter-amqp")
     implementation("org.springframework.boot:spring-boot-starter-web")
@@ -46,7 +52,6 @@ dependencies {
     testImplementation("org.testcontainers:junit-jupiter")
     testImplementation("org.testcontainers:postgresql")
     testImplementation("org.testcontainers:rabbitmq")
-    testImplementation("com.github.dasniko:testcontainers-keycloak:3.5.1")
     testImplementation("org.springframework.security:spring-security-test")
     testImplementation("org.springframework.batch:spring-batch-test")
     testImplementation("org.mockito.kotlin:mockito-kotlin:5.4.0")

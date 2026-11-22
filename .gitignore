@@ -38,3 +38,10 @@ out/
 
 ### Kotlin ###
 .kotlin
+/CLAUDE.md
+/NOTE.md
+/.env
+/casdoor/casdoor.env
+/casdoor/credentials.json
+/casdoor/init_data.json
+/coursework/casdoor/

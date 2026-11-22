@@ -1,7 +1,0 @@
----
-- name: Deploy app
-  hosts: raggies_app
-  become: true
-  roles:
-    - role: ../roles/notifications
-      tags: [ container, app ]

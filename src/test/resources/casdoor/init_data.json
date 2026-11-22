@@ -1,0 +1,35 @@
+{
+  "organizations": [
+    {
+      "owner": "admin",
+      "name": "raggies-org",
+      "displayName": "Raggies Notification Tests",
+      "passwordType": "bcrypt",
+      "defaultApplication": "raggies-notification"
+    }
+  ],
+  "applications": [
+    {
+      "owner": "admin",
+      "name": "raggies-notification",
+      "displayName": "Raggies Notification Tests",
+      "organization": "raggies-org",
+      "clientId": "raggies-notification",
+      "clientSecret": "notification-test-client-secret",
+      "tokenFormat": "JWT-Custom",
+      "tokenAttributes": [
+        {"name": "authorities", "category": "Static Value", "value": "ADMIN", "type": "Array"}
+      ]
+    }
+  ],
+  "users": [
+    {
+      "owner": "test-org",
+      "name": "testuser",
+      "password": "testpassword",
+      "displayName": "Test User",
+      "email": "test@example.com",
+      "isAdmin": false
+    }
+  ]
+}

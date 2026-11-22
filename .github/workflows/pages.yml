@@ -1,0 +1,51 @@
+name: Project page
+
+on:
+  push:
+    branches: [main, master]
+    paths: [pages/**, .github/workflows/pages.yml]
+  workflow_dispatch:
+
+concurrency:
+  group: github-pages
+
+jobs:
+  publish:
+    if: vars.PAGES_ENABLED == 'true' && github.ref_name == github.event.repository.default_branch
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    env:
+      RENDER_PUBLIC_URL: ${{ vars.RENDER_PUBLIC_URL }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/configure-pages@v5
+      - name: Add project links
+        run: |
+          python3 - <<'PY'
+          from html import escape
+          from os import environ
+          from pathlib import Path
+
+          page = Path("pages/index.html")
+          repository = environ["GITHUB_SERVER_URL"] + "/" + environ["GITHUB_REPOSITORY"]
+          demo = environ.get("RENDER_PUBLIC_URL", "").rstrip("/")
+          demo_link = ""
+          if demo:
+              url = escape(demo + "/swagger-ui/index.html", quote=True)
+              demo_link = f'<li><a href="{url}">Swagger работающего сервиса</a></li>'
+          page.write_text(
+              page.read_text().replace("{{REPOSITORY}}", escape(repository, quote=True))
+              .replace("{{DEMO_LINK}}", demo_link)
+          )
+          PY
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: pages
+      - uses: actions/deploy-pages@v4
+        id: deployment

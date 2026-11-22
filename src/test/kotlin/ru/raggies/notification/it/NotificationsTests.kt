@@ -26,7 +26,7 @@ class NotificationsTests {
         jwtHelper.generateJwt()
     }
 
-    //@Test
+    @Test
     fun `Should return notification list`() {
         val notifications = notificationsHelper.tryToGetNotifications(defaultJwt)
             .groupBy { it.name }
@@ -38,7 +38,7 @@ class NotificationsTests {
         }
     }
 
-    //@Test
+    @Test
     fun `Should return notification types list`() {
         val notifications = notificationsHelper.tryToGetNotificationTypes(defaultJwt)
         assertTrue(notifications.isNotEmpty())

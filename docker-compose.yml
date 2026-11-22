@@ -1,16 +1,107 @@
+name: raggies-coursework-auth
+
 services:
   app:
+    profiles: [app]
     container_name: notifications-service
+    image: ${NOTIFICATION_IMAGE:-raggies-notification:local}
     build:
       context: .
       dockerfile: Dockerfile
+      args:
+        BUILD_COMMIT: ${BUILD_COMMIT:-local}
+    environment:
+      DATABASE_URL: jdbc:postgresql://postgres:5432/raggies
+      DATABASE_USERNAME: postgres
+      DATABASE_PASSWORD: ${POSTGRES_PASSWORD:-password}
+      SPRING_RABBITMQ_HOST: rabbitmq
+      JWT_ISSUER_URI: http://localhost:8000
+      SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_JWK_SET_URI: http://casdoor:8000/.well-known/jwks
+      SMTP_HOST: smtp
+      SMTP_PORT: 1025
+      SPRING_MAIL_PROPERTIES_MAIL_SMTP_AUTH: "false"
+      SPRING_MAIL_PROPERTIES_MAIL_SMTP_STARTTLS_ENABLE: "false"
     ports:
-      - '8180:8180'
+      - "127.0.0.1:8180:8180"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+      smtp:
+        condition: service_started
     restart: on-failure
+
+  postgres:
+    image: postgres:16.3
+    container_name: raggies-postgres
+    environment:
+      POSTGRES_DB: raggies
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-password}
+    ports:
+      - "127.0.0.1:5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./casdoor/2026-11-22-init_schema.sql:/docker-entrypoint-initdb.d/10-casdoor-schema.sql:ro
+    healthcheck:
+      test: ["CMD", "pg_isready", "-h", "127.0.0.1", "-U", "postgres", "-d", "raggies"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    restart: on-failure
+
+  rabbitmq:
+    image: rabbitmq:management
+    container_name: rabbitmq
+    environment:
+      RABBITMQ_DEFAULT_USER: admin
+      RABBITMQ_DEFAULT_PASS: admin
+      RABBITMQ_DEFAULT_VHOST: vhost
+    ports:
+      - "127.0.0.1:5672:5672"
+      - "127.0.0.1:15672:15672"
+    volumes:
+      - rabbitmq-data:/var/lib/rabbitmq
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "-q", "ping"]
+      interval: 10s
+      timeout: 10s
+      retries: 10
+    restart: unless-stopped
+
+  casdoor:
+    image: casbin/casdoor:4.30.0
+    container_name: raggies-casdoor
+    ports:
+      - "127.0.0.1:8000:8000"
+    env_file:
+      - ./casdoor/casdoor.env
+    environment:
+      driverName: postgres
+      dbName: raggies
+      dataSourceName: "user=postgres password='${POSTGRES_PASSWORD:-password}' host=postgres port=5432 sslmode=disable search_path=casdoor_schema dbname=raggies"
+      initDataNewOnly: "true"
+      origin: http://localhost:8000
+    volumes:
+      - type: bind
+        source: ./casdoor/init_data.json
+        target: /init_data.json
+        read_only: true
+        bind:
+          create_host_path: false
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: unless-stopped
 
   smtp:
     image: mailhog/mailhog:v1.0.1
     container_name: raggies-smtp
     ports:
-      - "1025:1025"
-      - "8025:8025"
+      - "127.0.0.1:1025:1025"
+      - "127.0.0.1:8025:8025"
+
+volumes:
+  pgdata:
+  rabbitmq-data:

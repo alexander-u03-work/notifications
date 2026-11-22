@@ -10,11 +10,11 @@ class UserModerationEventParamsExtractor: DefaultJobParamsExtractor() {
     override fun getType(): String = UserModerationEvent::class.simpleName!!
 
     override fun getUserSubjects(params: JobParameters): List<String>
-        = listOf(params.getString("subject")!!)
+        = listOf(params.getString("userSubject")!!)
 
     override fun getMessageArgs(params: JobParameters): Map<String, Any> {
         val args = mutableMapOf<String, Any>(
-            "userId" to params.getLong("userId")!!
+            "userId" to (params.getLong("userId") ?: params.getString("userSubject")!!)
         )
 
         params.getString("issueType")?.also {

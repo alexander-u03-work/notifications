@@ -1,0 +1,91 @@
+name: Notification CI
+
+on:
+  pull_request:
+  push:
+    branches: [main, master]
+  workflow_dispatch:
+
+concurrency:
+  group: notification-ci-${{ github.ref }}
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    env:
+      BUILD_COMMIT: ${{ github.sha }}
+      NOTIFICATION_IMAGE: raggies-notification:${{ github.sha }}
+      RENDER_PUBLIC_URL: ${{ vars.RENDER_PUBLIC_URL }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build and start Notification in Docker
+        run: |
+          printf 'initAdminPassword=%s\n' "$(openssl rand -hex 24)" > casdoor/casdoor.env
+          docker compose up -d --build app
+          curl --fail --silent --show-error --retry 30 --retry-all-errors \
+            --retry-delay 2 --max-time 5 http://127.0.0.1:8180/actuator/health
+          curl --fail --silent --show-error http://127.0.0.1:8180/actuator/info \
+            | jq --exit-status --arg sha "$BUILD_COMMIT" '.build.commit == $sha'
+
+      - name: Run regression suite in Docker
+        run: |
+          mkdir -p "$RUNNER_TEMP/notification-test-results"
+          docker build --target source --tag raggies-notification-tests .
+          docker run --rm --network host \
+            --volume /var/run/docker.sock:/var/run/docker.sock \
+            --volume "$RUNNER_TEMP/notification-test-results:/app/build" \
+            raggies-notification-tests ./gradlew --no-daemon test
+
+      - name: Upload regression results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: notification-regression
+          path: |
+            ${{ runner.temp }}/notification-test-results/test-results/test
+            ${{ runner.temp }}/notification-test-results/reports/tests/test
+
+      - name: Publish tested image to GHCR
+        id: image
+        if: github.event_name == 'push' && github.ref_name == github.event.repository.default_branch
+        env:
+          GHCR_TOKEN: ${{ github.token }}
+        run: |
+          image="ghcr.io/${GITHUB_REPOSITORY,,}:$BUILD_COMMIT"
+          printf '%s' "$GHCR_TOKEN" | docker login ghcr.io -u "$GITHUB_ACTOR" --password-stdin
+          docker tag "$NOTIFICATION_IMAGE" "$image"
+          docker push "$image"
+          printf 'ref=%s\n' "$image" >> "$GITHUB_OUTPUT"
+
+      - name: Deploy image and verify the live revision
+        if: steps.image.outcome == 'success' && vars.RENDER_PUBLIC_URL != ''
+        env:
+          RENDER_DEPLOY_HOOK_URL: ${{ secrets.RENDER_DEPLOY_HOOK_URL }}
+          IMAGE_REF: ${{ steps.image.outputs.ref }}
+        run: |
+          : "${RENDER_DEPLOY_HOOK_URL:?Configure the Render deploy hook secret}"
+          image_url=$(jq -rn --arg image "$IMAGE_REF" '$image | @uri')
+          curl --fail --silent --show-error --max-time 30 --output /dev/null \
+            --request POST "${RENDER_DEPLOY_HOOK_URL}&imgURL=$image_url"
+          for attempt in $(seq 1 60); do
+            if curl --fail --silent --max-time 10 "${RENDER_PUBLIC_URL%/}/actuator/info" \
+              | jq --exit-status --arg sha "$BUILD_COMMIT" '.build.commit == $sha' >/dev/null; then
+              printf 'Public service is running %s\n' "$BUILD_COMMIT"
+              exit 0
+            fi
+            sleep 10
+          done
+          printf 'Render did not serve revision %s in time\n' "$BUILD_COMMIT" >&2
+          exit 1
+
+      - name: Collect startup logs on failure
+        if: failure()
+        run: docker compose --profile app logs --no-color app
+
+      - name: Stop local containers
+        if: always()
+        run: docker compose --profile app down --volumes
