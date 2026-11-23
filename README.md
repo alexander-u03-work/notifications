@@ -39,7 +39,7 @@ MailHog на `http://localhost:8025`. Casdoor загружает организ�
 
 ### GitHub Actions
 
-Workflow **Notification CI** по пушу в `main` или `master` запускает образ с
+Workflow **Notification CI** по пушу в  `master` запускает образ с
 PostgreSQL, RabbitMQ и MailHog, проверяет HTTP-ответ и прогоняет регрессию
 в Docker. Отчёт Gradle доступен в артефакте `notification-regression`.
 После успешного прогона на основной ветке образ с тегом SHA публикуется в GHCR.
